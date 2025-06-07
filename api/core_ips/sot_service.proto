@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package core_ips.sot;
+
+service Sot {
+    rpc Track(TrackRequest) returns (stream TrackResponse) {}
+}
+
+message BBox {          // bounding_box
+    float xtl = 1;      // x top-left
+    float ytl = 2;      // y top-left
+    float width = 3;
+    float height = 4;
+}
+
+message SotInfo {
+    BBox bbox = 1;
+    float score = 2;
+}
+
+message TrackRequest {
+    BBox init_bbox = 1;
+}
+
+message TrackResponse {
+    enum State {
+        NONE = 0;
+        NORMAL = 1;
+        INTERRUPTED = 2;
+        NOT_ENOUGH_RESOURCES = 3;
+        VIDEO_DISCONNECTED = 4;
+    }
+    State state = 1;
+    SotInfo result = 2;
+}

@@ -1,0 +1,7 @@
+{
+    "core_ips": {
+        "address": "localhost",
+        "port": 6
+    },
+    "rtsp_source": "rtsp://xxxx"
+}
