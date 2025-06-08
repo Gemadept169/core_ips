@@ -18,8 +18,13 @@
 # Todo list
 - [x] Download Postman and test GrpcServer
 - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
-- [ ] Auto reconnecting when rtsp failed
-- [ ] 
+- [ ] Auto reconnecting when rtsp streaming failed
+- [ ] Write json config parser based on Qt example for game
+- [ ] Test bottleneck 
+  - [ ] Calculate frame reading rate from rtsp to opencv
+  - [ ] Calculate sot processing time
+  - [ ] Calculate delay all process
+- [ ] Write a client-side project to evaluate system (Using Qt5, not prefer Qt6)
 
 # Introduction
 - A Back-end service for image processing service.
