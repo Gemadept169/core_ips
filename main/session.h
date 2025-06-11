@@ -19,13 +19,15 @@ class Session : public QObject {
     Session &operator=(const Session &) = delete;
     ~Session();
 
+   public slots:
+    void handleSotTrackNewRequest(const sot::BBox &initBox);
+    void handleSotTrackStopRequest();
+
    private:
-    // void registerMetatype void initObjectConnections();
     void registerQMetaTypes();
     void initObjectConnections();
     void startThreads();
     void quitThreads();
-    void initTimers();
 
    private:
     QThread _grpcThread;

@@ -20,7 +20,7 @@ void SotController::atStarted() {
     connect(this, &SotController::startSot, _handler, &SotHandler::atStartTracking);
     connect(this, &SotController::processSot, _handler, &SotHandler::atProcessTracking);
     connect(this, &SotController::stopSot, _handler, &SotHandler::atStopTracking);
-    connect(_handler, &SotHandler::hasResult, this, &SotController::hasSotResult);
+    connect(_handler, &SotHandler::hasResult, this, &SotController::hasResult);
 
     _handlerThread.start();
 }

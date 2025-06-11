@@ -19,9 +19,8 @@ class CallbackBase {
     CallbackBase& operator=(const CallbackBase&) = delete;
     ~CallbackBase();
 
-    QPointer<GrpcServer> grpcServer() const;
-
    protected:
+    QPointer<GrpcServer> grpcServer() const;
     QPointer<GrpcServer> _grpcServer;
 };
 

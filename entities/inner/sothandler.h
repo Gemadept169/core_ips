@@ -22,7 +22,7 @@ class SotHandler : public QObject {
 
    public slots:
     void atStarted();
-    void atStartTracking(const ::sot::BBox &initBBox);
+    void atStartTracking(const sot::BBox &initBBox);
     void atProcessTracking(const cv::Mat &frame);
     void atStopTracking();
 

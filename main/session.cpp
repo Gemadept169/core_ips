@@ -18,6 +18,29 @@ Session::~Session() {
     quitThreads();
 }
 
+void Session::handleSotTrackNewRequest(const sot::BBox& initBox) {
+    if (!_videoReader || !_sotController || !_grpcServer) {
+        return;
+    }
+    QMetaObject::invokeMethod(_sotController,
+                              &SotController::startSot,
+                              Qt::QueuedConnection,
+                              initBox);
+    QObject::connect(_videoReader, &VideoReader::hasVideoNewFrame, _sotController, &SotController::processSot);
+    QObject::connect(_sotController, &SotController::hasResult, _grpcServer, &GrpcServer::atSotResults);
+}
+
+void Session::handleSotTrackStopRequest() {
+    if (!_videoReader || !_sotController || !_grpcServer) {
+        return;
+    }
+    QMetaObject::invokeMethod(_sotController,
+                              &SotController::stopSot,
+                              Qt::QueuedConnection);
+    QObject::disconnect(_videoReader, &VideoReader::hasVideoNewFrame, _sotController, &SotController::processSot);
+    QObject::disconnect(_sotController, &SotController::hasResult, _grpcServer, &GrpcServer::atSotResults);
+}
+
 void Session::registerQMetaTypes() {
     qRegisterMetaType<cv::Mat>("cv::Mat");
     qRegisterMetaType<sot::BBox>("sot::BBox");
@@ -27,14 +50,14 @@ void Session::registerQMetaTypes() {
 void Session::initObjectConnections() {
     QObject::connect(&_grpcThread, &QThread::started, _grpcServer, &GrpcServer::atStarted);
     QObject::connect(&_grpcThread, &QThread::finished, _grpcServer, &GrpcServer::deleteLater);
+    QObject::connect(_grpcServer, &GrpcServer::hasSotTrackNewRequest, this, &Session::handleSotTrackNewRequest);
+    QObject::connect(_grpcServer, &GrpcServer::hasSotTrackStop, this, &Session::handleSotTrackStopRequest);
 
     QObject::connect(&_videoThread, &QThread::started, _videoReader, &VideoReader::atStarted);
     QObject::connect(&_videoThread, &QThread::finished, _videoReader, &VideoReader::deleteLater);
 
     QObject::connect(&_sotThread, &QThread::started, _sotController, &SotController::atStarted);
     QObject::connect(&_sotThread, &QThread::finished, _sotController, &SotController::deleteLater);
-    // QObject::connect(&_grpcThread, &GrpcServer::hasNewSotTrackRequest, /* trick new for image processing control */);
-    // QObject::connect(&_grpcThread, &GrpcServer::hasSotTrackStop, /* trick new for image processing control */);
 }
 
 void Session::startThreads() {
@@ -52,7 +75,4 @@ void Session::quitThreads() {
 
     _sotThread.quit();
     _sotThread.wait();
-}
-
-void Session::initTimers() {
 }

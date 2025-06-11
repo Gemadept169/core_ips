@@ -17,7 +17,7 @@ class SotController final : public QObject {
     void startSot(const sot::BBox &initBox);
     void processSot(const cv::Mat &incomingFrame);
     void stopSot();
-    void hasSotResult(const sot::SotInfo &result);
+    void hasResult(const sot::SotInfo &result);
 
    public slots:
     void atStarted();
