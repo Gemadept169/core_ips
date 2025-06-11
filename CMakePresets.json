@@ -20,7 +20,9 @@
                 "CMAKE_BUILD_TYPE": "Debug"
             },
             "environment": {
-                "LD_LIBRARY_PATH": "${sourceDir}/../3rdparty/grpc/lib"
+                "LD_LIBRARY_PATH": "${sourceDir}/../3rdparty/grpc/lib:${sourceDir}/../3rdparty/opencv/lib:${sourceDir}/../internal/sot/lib",
+                "SOT_DATA_PATH": "${sourceDir}/../internal/sot/data",
+                "GST_DEBUG": "2"
             }
         },
         {
@@ -37,7 +39,9 @@
                 "CMAKE_BUILD_TYPE": "Release"
             },
             "environment": {
-                "LD_LIBRARY_PATH": "${sourceDir}/../3rdparty/grpc/lib"
+                "LD_LIBRARY_PATH": "${sourceDir}/../3rdparty/grpc/lib:${sourceDir}/../3rdparty/opencv/lib:${sourceDir}/../internal/sot/lib",
+                "SOT_DATA_PATH": "${sourceDir}/../internal/sot/data",
+                "GST_DEBUG": "2"
             }
         }
     ]
