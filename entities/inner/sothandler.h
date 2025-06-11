@@ -18,17 +18,17 @@ class SotHandler : public QObject {
     ~SotHandler();
 
    signals:
-    void hasTrackResult(const sot::SotInfo &);
+    void hasResult(const sot::SotInfo &);
 
    public slots:
-    void started();
-    void startTracking(const ::sot::BBox &initBBox);
-    void processTracking(const cv::Mat &frame);
-    void stopTracking();
+    void atStarted();
+    void atStartTracking(const ::sot::BBox &initBBox);
+    void atProcessTracking(const cv::Mat &frame);
+    void atStopTracking();
 
    private:
-    std::unique_ptr<::sot::SotInferInterface> m_inferTrack;
-    ::sot::BBox m_initBBoxTrack;
-    bool m_isFirstTrack;
+    std::unique_ptr<sot::SotInferInterface> _engine;
+    sot::BBox _initTrackBox;
+    bool _isFirstTrack;
 };
 #endif

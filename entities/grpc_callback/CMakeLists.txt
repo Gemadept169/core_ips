@@ -1,4 +1,4 @@
-file(GLOB_RECURSE sources *.cpp)
+file(GLOB sources *.cpp)
 qt_add_library(entities_grpc_callback STATIC
     ${sources}
 )
@@ -10,4 +10,4 @@ target_include_directories(entities_grpc_callback
     ${CORE_3RDPARTY_PATH}/opencv/include/opencv4)
 target_link_libraries(entities_grpc_callback
     PUBLIC
-    Qt6::Core api sot::sot_base)
+    Qt6::Core api utilities sot::sot_base)

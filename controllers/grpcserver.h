@@ -12,7 +12,7 @@
 #include "sot/types.hpp"
 
 class SotCallback;
-class GrpcServer : public QObject {
+class GrpcServer final : public QObject {
     Q_OBJECT
    public:
     GrpcServer(const std::string &hostname, const unsigned int &port, QObject *parent = nullptr);
@@ -28,14 +28,11 @@ class GrpcServer : public QObject {
     void atStarted();
     void atSotResults(const sot::SotInfo &info);
 
-   public:
+   private:
     void setHostname(const std::string &hostname);
     void setPort(const unsigned int &port);
     void startServer();
     void stopServer();
-
-   private:
-    void registerQtMetaTypes();
 
     SotCallback *_sotCallback;
     std::string _hostname;

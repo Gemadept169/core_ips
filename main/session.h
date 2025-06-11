@@ -3,11 +3,13 @@
 
 #include <QMetaObject>
 #include <QObject>
-#include <QPointer>
+#include <QSharedPointer>
 #include <QThread>
 #include <QTimer>
 
 #include "controllers/grpcserver.h"
+#include "controllers/sotcontroller.h"
+#include "controllers/videoreader.h"
 
 class Session : public QObject {
     Q_OBJECT
@@ -19,14 +21,20 @@ class Session : public QObject {
 
    private:
     // void registerMetatype void initObjectConnections();
+    void registerQMetaTypes();
     void initObjectConnections();
     void startThreads();
     void quitThreads();
     void initTimers();
 
    private:
-    QThread _grpcServerThread;
-    GrpcServer _grpcServer;
+    QThread _grpcThread;
+    QThread _videoThread;
+    QThread _sotThread;
+
+    GrpcServer *_grpcServer;
+    VideoReader *_videoReader;
+    SotController *_sotController;
 };
 
 #endif

@@ -13,7 +13,6 @@ GrpcServer::GrpcServer(const std::string& hostname,
       _hostname(hostname),
       _port(port),
       _sotCallback(new SotCallback(this)) {
-    registerQtMetaTypes();
 }
 
 GrpcServer::~GrpcServer() {
@@ -39,7 +38,7 @@ void GrpcServer::setPort(const unsigned int& port) {
 
 void GrpcServer::startServer() {
     QThread* grpcThread = QThread::create([this]() -> void {
-        std::string server_address{"192.168.0.106:52124"};  // TODO: Must be read from a config file
+        std::string server_address{"localhost:52124"};  // TODO: Must be read from a config file
         grpc::ServerBuilder builder;
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
         builder.RegisterService(_sotCallback);
@@ -55,9 +54,4 @@ void GrpcServer::stopServer() {
     if (_server) {
         _server->Shutdown();
     }
-}
-
-void GrpcServer::registerQtMetaTypes() {
-    qRegisterMetaType<sot::BBox>("sot::BBox");
-    qRegisterMetaType<sot::SotInfo>("sot::SotInfo");
 }

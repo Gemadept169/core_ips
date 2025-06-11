@@ -75,8 +75,8 @@ message("[${CMAKE_PROJECT_NAME}] [sot] libraries: ${Sot_LIBRARIES}")
 ##############################################################################
 ### FOR THE DEBUG PURPOSE
 ##############################################################################
-# get_property(imported_targets_after DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-# message("[${CMAKE_PROJECT_NAME}] Imported targets: ${imported_targets_after}")
+get_property(imported_targets_after DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
+message("[${CMAKE_PROJECT_NAME}] Imported targets: ${imported_targets_after}")
 
 add_subdirectory(controllers)
 add_subdirectory(entities)
