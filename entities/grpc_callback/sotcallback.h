@@ -20,6 +20,8 @@ class SotCallback : public CallbackBase,
     grpc::ServerWriteReactor<::core_ips::sot::TrackResponse>* Track(grpc::CallbackServerContext* context,
                                                                     const ::core_ips::sot::TrackRequest* request) override;
 
+    void pushResultData(const sot::SotInfo& info);
+
    private:
     SafeQueue<::sot::SotInfo> _dataQueue;
     std::chrono::milliseconds _streamTimeoutMsecs;

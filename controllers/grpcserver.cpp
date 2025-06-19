@@ -23,9 +23,9 @@ void GrpcServer::atStarted() {
 }
 
 void GrpcServer::atSotResults(const sot::SotInfo& info) {
-    // if (_ipsSotCallback) {
-    //     _ipsSotCallback->pushResultData(info);
-    // }
+    if (_sotCallback) {
+        _sotCallback->pushResultData(info);
+    }
 }
 
 void GrpcServer::setHostname(const std::string& hostname) {

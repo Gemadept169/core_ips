@@ -107,3 +107,7 @@ grpc::ServerWriteReactor<::core_ips::sot::TrackResponse>* SotCallback::Track(
     _dataQueue.clear();
     return new SotDataLister(this);
 }
+
+void SotCallback::pushResultData(const sot::SotInfo& info) {
+    _dataQueue.pushBack(info);
+}

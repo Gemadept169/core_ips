@@ -52,10 +52,8 @@ void CvVideoCapture::stopCapture() {
 }
 
 void CvVideoCapture::readFrame() {
-    qDebug() << "[CvVideoCapture::readFrame]";
     cv::Mat incomingFrame;
     if (!_cap.empty() && _cap->read(incomingFrame)) {
-        qDebug() << "[CvVideoCapture::readFrame] has a new frame";
         emit hasVideoNewFrame(incomingFrame);
     } else {
         stopCapture();
