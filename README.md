@@ -21,6 +21,7 @@
 - [x] Add SotController and test
 - [x] Write a client-side project to evaluate system (Using Qt5, not prefer Qt6)
 - [ ] Make grpc communication completely (at both server and client sides)
+- [ ] Stop server-streaming sot infor when lost track for 10 frames (read from config file)
 - [ ] Rewrite sot library to build with release option.
 - [ ] Test bottleneck 
   - [ ] Calculate frame reading rate from rtsp to opencv

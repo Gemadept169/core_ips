@@ -1,53 +1,46 @@
 #ifndef OUTER_UTILITIES_SAFEQUEUE_H
 #define OUTER_UTILITIES_SAFEQUEUE_H
-#include <QMutex>
-#include <QQueue>
-#include <QWaitCondition>
+
+#include <mutex>
+#include <queue>
 
 template <typename T>
 class SafeQueue {
    public:
-    explicit SafeQueue(const unsigned int& waitTimeoutMsecs)
-        : _waitTimeoutMsecs(waitTimeoutMsecs) {
-    }
-    void setWaitTimeoutMsecs(const unsigned int& secs) {
-        _waitTimeoutMsecs = secs;
+    explicit SafeQueue() {
     }
 
     void pushBack(const T& item) {
-        QMutexLocker locker(&_mutex);
-        _queue.push_back(item);
-        _condition.notify_one();
+        std::lock_guard<std::mutex> locker(_mutex);
+        _queue.push(item);
     }
 
-    bool popFrontBlockingWithTimeout(T& item) {
-        QMutexLocker locker(&_mutex);
-        bool hasItem = true;
-        if (_queue.isEmpty()) {
-            hasItem = _condition.wait(&_mutex, _waitTimeoutMsecs);
-        }
-        if (hasItem) {
+    bool popFront(T& item) {
+        std::lock_guard<std::mutex> locker(_mutex);
+        bool hasItem = false;
+        if (!_queue.empty()) {
             item = _queue.front();
-            _queue.pop_front();
+            _queue.pop();
+            hasItem = true;
         }
         return hasItem;
     }
 
     void clear() {
-        QMutexLocker locker(&_mutex);
-        _queue.clear();
+        std::lock_guard<std::mutex> locker(_mutex);
+        while (!_queue.empty()) {
+            _queue.pop();
+        }
     }
 
     int size() {
-        QMutexLocker locker(&_mutex);
+        std::lock_guard<std::mutex> locker(_mutex);
         return _queue.size();
     }
 
    private:
-    QQueue<T> _queue;
-    unsigned int _waitTimeoutMsecs;
-    QMutex _mutex;
-    QWaitCondition _condition;
+    std::queue<T> _queue;
+    std::mutex _mutex;
 };
 
 #endif
