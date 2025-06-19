@@ -4,6 +4,7 @@
 - [Folder structure](#folder-structure)
 - [Environment for development](#environment-for-development)
   - [At the first time](#at-the-first-time)
+    - [System](#system)
     - [Preparation](#preparation)
     - [Qt6](#qt6)
     - [Build and release OpenCV](#build-and-release-opencv)
@@ -17,19 +18,21 @@
 
 # Todo list
 - [x] Download Postman and test GrpcServer
-- [ ] Add SotController and test
-- [ ] Optimize the pipeline
-  - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
-  - [ ] Auto reconnecting when rtsp streaming failed
-- [ ] Write json config parser based on Qt example for game
+- [x] Add SotController and test
+- [x] Write a client-side project to evaluate system (Using Qt5, not prefer Qt6)
+- [ ] Make grpc communication completely (at both server and client sides)
+- [ ] Rewrite sot library to build with release option.
 - [ ] Test bottleneck 
   - [ ] Calculate frame reading rate from rtsp to opencv
   - [ ] Calculate sot processing time
   - [ ] Calculate delay all process
-- [ ] Write a client-side project to evaluate system (Using Qt5, not prefer Qt6)
+- [ ] Optimize the gst pipeline for capturing video
+  - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
+  - [ ] Auto reconnecting when rtsp streaming failed
+- [ ] Write json config parser based on Qt example for game
 
 # Introduction
-- A Back-end service for image processing service.
+- A Back-end service for image processing.
 # Folder structure
 - The structure of folders in the project:
 ```
@@ -55,6 +58,8 @@
 ```
 # Environment for development
 ## At the first time
+### System
+- Reference to [My Jetson Orin AGX](./docs/jetson_system_information.md)
 ### Preparation
 ```
 sudo apt update

@@ -56,6 +56,8 @@ gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=100 tcp
 
 gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=200 ! fakesink
 
+rtspsrc location=rtsp://192.168.0.101:8555/cam latency=100 tcp-timeout=1 ! queue ! rtph264depay ! h264parse ! avdec_h264 output-corrupt=false ! autovideosink
+
 curl -X DESCRIBE rtsp://192.168.1.250:8555/cam --max-time 5 -v
 
 ```
