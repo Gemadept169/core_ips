@@ -8,7 +8,9 @@
 | `nvvidconv`     | NVIDIA converter (colorspace, format, scaling)                 |
 | `nvoverlaysink` | Displays the video using NVIDIA overlay (zero-copy to display) |
 
-
+```
+ffprobe -v error -rtsp_transport tcp -timeout 5000000 -i rtsp://192.168.1.250:8555/cam
+```
 
 # Debug level table
 - Which is a number specifying the amount of desired output:
@@ -60,4 +62,5 @@ rtspsrc location=rtsp://192.168.0.101:8555/cam latency=100 tcp-timeout=1 ! queue
 
 curl -X DESCRIBE rtsp://192.168.1.250:8555/cam --max-time 5 -v
 
+gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=200 ! rtph264depay ! h264parse config-interval=-1 ! nvv4l2decoder ! nv3dsink
 ```
