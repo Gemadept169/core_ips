@@ -2,9 +2,9 @@
 
 #include <QThread>
 
-class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
+class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
    public:
-    SotDataLister(SotCallback* sotCallback, grpc::CallbackServerContext* context)
+    SotCallbackImpl(SotCallback* sotCallback, grpc::CallbackServerContext* context)
         : _startingTimepoint(std::chrono::steady_clock::now()),
           _sotLostTrackCounter(0),
           _sotCallback(sotCallback),
@@ -31,7 +31,7 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
     }
 
     void OnDone() override {
-        std::cout << "[SotDataLister] OnDone" << std::endl;
+        std::cout << "[SotCallbackImpl] OnDone" << std::endl;
         if (_sotCallback && _sotCallback->grpcServer()) {
             QMetaObject::invokeMethod(_sotCallback->grpcServer(),
                                       &GrpcServer::hasSotTrackStop,
@@ -41,7 +41,7 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
     }
 
     void OnCancel() override {
-        std::cout << "[SotDataLister] OnCancel" << std::endl;
+        std::cout << "[SotCallbackImpl] OnCancel" << std::endl;
     }
 
    private:
@@ -143,7 +143,7 @@ grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::Track(
                                   incomingBox);
     }
     _dataQueue.clear();
-    return new SotDataLister(this, context);
+    return new SotCallbackImpl(this, context);
 }
 
 void SotCallback::pushResultData(const sot::SotInfo& info) {
