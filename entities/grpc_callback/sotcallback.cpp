@@ -1,12 +1,17 @@
 #include "sotcallback.h"
 
-class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResponse> {
+#include <QThread>
+
+class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
    public:
-    SotDataLister(SotCallback* sotCallback)
+    SotDataLister(SotCallback* sotCallback, grpc::CallbackServerContext* context)
         : _startingTimepoint(std::chrono::steady_clock::now()),
-          _sotCallback(sotCallback) {
+          _sotLostTrackCounter(0),
+          _sotCallback(sotCallback),
+          _context(context) {
         if (_sotCallback) {
             _streamTimeoutMsecs = _sotCallback->_streamTimeoutMsecs;
+            _sotCallback->_isBusy.store(true);
         }
         if (!readDataFromQueueAndWriteToStream()) {
             Finish(grpc::Status(grpc::StatusCode::CANCELLED, "Failed at SotDataLister constructor"));
@@ -24,6 +29,7 @@ class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResp
     }
 
     void OnDone() override {
+        std::cout << "[SotDataLister] OnDone" << std::endl;
         if (_sotCallback && _sotCallback->grpcServer()) {
             QMetaObject::invokeMethod(_sotCallback->grpcServer(),
                                       &GrpcServer::hasSotTrackStop,
@@ -41,10 +47,25 @@ class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResp
         if (!_sotCallback) return false;
         bool result{false};
         for (;;) {
+            if (_context->IsCancelled() || !_sotCallback->_isBusy.load()) {
+                result = false;
+                break;
+            }
+
+            if (_sotLostTrackCounter > 10) {  // TODO: must read from config file
+                result = false;
+                break;
+            }
+
             sot::SotInfo incomingInfo;
-            bool isRead = _sotCallback->_dataQueue.popFrontBlockingWithTimeout(incomingInfo);
+            bool isRead = _sotCallback->_dataQueue.popFront(incomingInfo);
             if (isRead) {
                 _startingTimepoint = std::chrono::steady_clock::now();
+                if (incomingInfo.score > 0.9f) {
+                    _sotLostTrackCounter = 0;
+                } else {
+                    _sotLostTrackCounter++;
+                }
                 // Refer: https://stackoverflow.com/questions/33960999/protobuf-will-set-allocated-delete-the-allocated-object
                 auto out = new core_ips::sot::SotInfo();
                 auto outBox = new core_ips::sot::BBox();
@@ -55,7 +76,7 @@ class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResp
                 out->set_allocated_bbox(outBox);
                 out->set_score(incomingInfo.score);
                 _output.set_allocated_result(out);
-                _output.set_state(::core_ips::sot::TrackResponse::State::TrackResponse_State_NORMAL);
+                _output.set_state(core_ips::sot::TrackResponse::State::TrackResponse_State_NORMAL);
                 StartWrite(&_output);
                 result = true;
                 break;
@@ -63,7 +84,6 @@ class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResp
                 auto curTimepoint = std::chrono::steady_clock::now();
                 std::chrono::milliseconds curDuration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(curTimepoint - _startingTimepoint);
-                std::cout << "+== duration:" << curDuration.count() << std::endl;
                 if (curDuration >= _streamTimeoutMsecs) {
                     result = false;
                     break;
@@ -75,24 +95,32 @@ class SotDataLister : public grpc::ServerWriteReactor<::core_ips::sot::TrackResp
         return result;
     }
 
-    ::core_ips::sot::TrackResponse _output;
-    std::chrono::milliseconds _streamTimeoutMsecs;
     SotCallback* _sotCallback;
+    int _sotLostTrackCounter;
+    int _writeNotDoneCounter;
+    grpc::CallbackServerContext* _context;
+    core_ips::sot::TrackResponse _output;
+    std::chrono::milliseconds _streamTimeoutMsecs;
     std::chrono::steady_clock::time_point _startingTimepoint;
 };
 
 SotCallback::SotCallback(GrpcServer* grpcServer)
     : CallbackBase(grpcServer),
-      _dataQueue(SafeQueue<::sot::SotInfo>(1000)),  // TODO: Must be read from a config file
-      _streamTimeoutMsecs(5000) {                   // TODO: Must be read from a config file
+      _isBusy(false),
+      _dataQueue(SafeQueue<sot::SotInfo>()),
+      _streamTimeoutMsecs(5000) {  // TODO: Must be read from a config file
 }
 
 SotCallback::~SotCallback() {
 }
 
-grpc::ServerWriteReactor<::core_ips::sot::TrackResponse>* SotCallback::Track(
+grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::Track(
     grpc::CallbackServerContext* context,
     const core_ips::sot::TrackRequest* request) {
+    if (_isBusy.load()) {
+        _isBusy.store(false);
+    }
+
     if (grpcServer() && request != nullptr) {
         sot::BBox incomingBox;
         incomingBox.xtl = request->init_bbox().xtl();
@@ -105,7 +133,7 @@ grpc::ServerWriteReactor<::core_ips::sot::TrackResponse>* SotCallback::Track(
                                   incomingBox);
     }
     _dataQueue.clear();
-    return new SotDataLister(this);
+    return new SotDataLister(this, context);
 }
 
 void SotCallback::pushResultData(const sot::SotInfo& info) {

@@ -1,6 +1,8 @@
 #ifndef GRPC_CALLBACK_SOTCALLBACK_H
 #define GRPC_CALLBACK_SOTCALLBACK_H
 
+#include <atomic>
+
 #include "callbackbase.h"
 #include "sot/types.hpp"
 #include "sot_service.grpc.pb.h"
@@ -17,13 +19,14 @@ class SotCallback : public CallbackBase,
     SotCallback& operator=(const SotCallback&) = delete;
     ~SotCallback();
 
-    grpc::ServerWriteReactor<::core_ips::sot::TrackResponse>* Track(grpc::CallbackServerContext* context,
-                                                                    const ::core_ips::sot::TrackRequest* request) override;
+    grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* Track(grpc::CallbackServerContext* context,
+                                                                  const core_ips::sot::TrackRequest* request) override;
 
     void pushResultData(const sot::SotInfo& info);
 
    private:
-    SafeQueue<::sot::SotInfo> _dataQueue;
+    std::atomic_bool _isBusy;
+    SafeQueue<sot::SotInfo> _dataQueue;
     std::chrono::milliseconds _streamTimeoutMsecs;
 };
 
