@@ -1,9 +1,12 @@
 syntax = "proto3";
 
+import "google/protobuf/empty.proto";
+
 package core_ips.sot;
 
 service Sot {
     rpc Track(TrackRequest) returns (stream TrackResponse) {}
+    rpc TrackStop(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
 message BBox {          // bounding_box

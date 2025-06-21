@@ -146,6 +146,24 @@ grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::Track(
     return new SotCallbackImpl(this, context);
 }
 
+grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* context,
+                                                 const google::protobuf::Empty* request,
+                                                 google::protobuf::Empty* response) {
+    if (_isBusy.load()) {
+        _isBusy.store(false);
+    }
+
+    if (grpcServer()) {
+        QMetaObject::invokeMethod(grpcServer(),
+                                  &GrpcServer::hasSotTrackStop,
+                                  Qt::QueuedConnection);
+    }
+
+    auto* reactor = context->DefaultReactor();
+    reactor->Finish(grpc::Status::OK);
+    return reactor;
+}
+
 void SotCallback::pushResultData(const sot::SotInfo& info) {
     _dataQueue.pushBack(info);
 }

@@ -22,6 +22,10 @@ class SotCallback : public CallbackBase,
     grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* Track(grpc::CallbackServerContext* context,
                                                                   const core_ips::sot::TrackRequest* request) override;
 
+    grpc::ServerUnaryReactor* TrackStop(grpc::CallbackServerContext* context,
+                                        const google::protobuf::Empty* request,
+                                        google::protobuf::Empty* response) override;
+
     void pushResultData(const sot::SotInfo& info);
 
    private:
