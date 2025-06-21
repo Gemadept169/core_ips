@@ -8,23 +8,25 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
         : _startingTimepoint(std::chrono::steady_clock::now()),
           _sotLostTrackCounter(0),
           _sotCallback(sotCallback),
+          _finishStatus(grpc::StatusCode::UNKNOWN, ""),
           _context(context) {
         if (_sotCallback) {
             _streamTimeoutMsecs = _sotCallback->_streamTimeoutMsecs;
             _sotCallback->_isBusy.store(true);
         }
-        if (!readDataFromQueueAndWriteToStream()) {
-            Finish(grpc::Status(grpc::StatusCode::CANCELLED, "Failed at SotDataLister constructor"));
+        if (!_readDataFromQueueAndWriteToStream()) {
+            _finish();
         }
     }
 
     void OnWriteDone(bool ok) override {
         if (ok) {
-            if (!readDataFromQueueAndWriteToStream()) {
-                Finish(grpc::Status(grpc::StatusCode::CANCELLED, "Sot data stream timeout was reached or has a terminated signal"));
+            if (!_readDataFromQueueAndWriteToStream()) {
+                _finish();
             }
         } else {
-            Finish(grpc::Status(grpc::StatusCode::UNKNOWN, "Unexpected Failure"));
+            _finishStatus = grpc::Status(grpc::StatusCode::UNKNOWN, "Unexpected failure when write done");
+            _finish();
         }
     }
 
@@ -43,16 +45,22 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
     }
 
    private:
-    bool readDataFromQueueAndWriteToStream() {
+    void _finish() {
+        Finish(_finishStatus);
+    }
+
+    bool _readDataFromQueueAndWriteToStream() {
         if (!_sotCallback) return false;
         bool result{false};
         for (;;) {
             if (_context->IsCancelled() || !_sotCallback->_isBusy.load()) {
+                _finishStatus = grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "Has new incoming request or cancellation signal");
                 result = false;
                 break;
             }
 
             if (_sotLostTrackCounter > 10) {  // TODO: must read from config file
+                _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over lost tracking");
                 result = false;
                 break;
             }
@@ -85,6 +93,7 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
                 std::chrono::milliseconds curDuration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(curTimepoint - _startingTimepoint);
                 if (curDuration >= _streamTimeoutMsecs) {
+                    _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over processing timeout");
                     result = false;
                     break;
                 } else {
@@ -98,6 +107,7 @@ class SotDataLister : public grpc::ServerWriteReactor<core_ips::sot::TrackRespon
     SotCallback* _sotCallback;
     int _sotLostTrackCounter;
     int _writeNotDoneCounter;
+    grpc::Status _finishStatus;
     grpc::CallbackServerContext* _context;
     core_ips::sot::TrackResponse _output;
     std::chrono::milliseconds _streamTimeoutMsecs;
