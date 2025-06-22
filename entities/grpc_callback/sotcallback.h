@@ -16,7 +16,9 @@ class SotCallback : public CallbackBase,
     friend TrackStartImpl;
 
    public:
-    explicit SotCallback(GrpcServer* grpcServer);
+    explicit SotCallback(GrpcServer* grpcServer,
+                         const std::chrono::milliseconds& writerTimeoutMsecs = std::chrono::milliseconds(1000),
+                         const unsigned int& trackLostFrameMax = 20);
     SotCallback(const SotCallback&) = delete;
     SotCallback& operator=(const SotCallback&) = delete;
     ~SotCallback();
@@ -35,7 +37,8 @@ class SotCallback : public CallbackBase,
     std::condition_variable _cv;
     std::mutex _mu;
     SafeQueue<sot::SotInfo> _dataQueue;
-    std::chrono::milliseconds _streamTimeoutMsecs;
+    std::chrono::milliseconds _writerTimeoutMsecs;
+    unsigned int _trackLostFrameMax;
 };
 
 #endif

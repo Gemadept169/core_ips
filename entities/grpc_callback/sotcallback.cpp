@@ -6,14 +6,13 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
    public:
     TrackStartImpl(SotCallback* sotCallback, grpc::CallbackServerContext* context)
         : _startingTimepoint(std::chrono::steady_clock::now()),
-          _sotLostTrackCounter(0),
+          _trackLostFrameCounter(0),
           _sotCallback(sotCallback),
           _finishStatus(grpc::StatusCode::UNKNOWN, ""),
           _context(context) {
-        if (_sotCallback) {
-            _streamTimeoutMsecs = _sotCallback->_streamTimeoutMsecs;
-            _sotCallback->_isBusy.store(true);
-        }
+        _writerTimeoutMsecs = _sotCallback->_writerTimeoutMsecs;
+        _trackLostFrameMax = _sotCallback->_trackLostFrameMax;
+        _sotCallback->_isBusy.store(true);
         if (!_readDataFromQueueAndWriteToStream()) {
             _finish();
         }
@@ -32,7 +31,7 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
 
     void OnDone() override {
         std::cout << "[TrackStartImpl] OnDone" << std::endl;
-        if (_sotCallback && _sotCallback->grpcServer()) {
+        if (_sotCallback->grpcServer()) {
             QMetaObject::invokeMethod(_sotCallback->grpcServer(),
                                       &GrpcServer::hasSotTrackStop,
                                       Qt::QueuedConnection);
@@ -55,7 +54,6 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
     }
 
     bool _readDataFromQueueAndWriteToStream() {
-        if (!_sotCallback) return false;
         bool result = false;
         for (;;) {
             if (_context->IsCancelled() || !_sotCallback->_isBusy.load()) {
@@ -64,7 +62,7 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
                 break;
             }
 
-            if (_sotLostTrackCounter > 20) {  // TODO: must read from config file
+            if (_trackLostFrameCounter >= _trackLostFrameMax) {
                 _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over lost tracking");
                 result = false;
                 break;
@@ -75,9 +73,9 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
             if (isRead) {
                 _startingTimepoint = std::chrono::steady_clock::now();
                 if (incomingInfo.score > 0.9f) {
-                    _sotLostTrackCounter = 0;
+                    _trackLostFrameCounter = 0;
                 } else {
-                    _sotLostTrackCounter++;
+                    _trackLostFrameCounter++;
                 }
                 // Refer: https://stackoverflow.com/questions/33960999/protobuf-will-set-allocated-delete-the-allocated-object
                 auto out = new core_ips::sot::SotInfo();
@@ -97,7 +95,7 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
                 auto curTimepoint = std::chrono::steady_clock::now();
                 std::chrono::milliseconds curDuration =
                     std::chrono::duration_cast<std::chrono::milliseconds>(curTimepoint - _startingTimepoint);
-                if (curDuration >= _streamTimeoutMsecs) {
+                if (curDuration >= _writerTimeoutMsecs) {
                     _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over processing timeout");
                     result = false;
                     break;
@@ -110,20 +108,21 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
     }
 
     SotCallback* _sotCallback;
-    int _sotLostTrackCounter;
-    int _writeNotDoneCounter;
+    int _trackLostFrameCounter;
+    int _trackLostFrameMax;
     grpc::Status _finishStatus;
     grpc::CallbackServerContext* _context;
     core_ips::sot::TrackResponse _output;
-    std::chrono::milliseconds _streamTimeoutMsecs;
+    std::chrono::milliseconds _writerTimeoutMsecs;
     std::chrono::steady_clock::time_point _startingTimepoint;
 };
 
-SotCallback::SotCallback(GrpcServer* grpcServer)
+SotCallback::SotCallback(GrpcServer* grpcServer, const std::chrono::milliseconds& writerTimeoutMsecs, const unsigned int& trackLostFrameMax)
     : CallbackBase(grpcServer),
       _isBusy(false),
       _dataQueue(SafeQueue<sot::SotInfo>()),
-      _streamTimeoutMsecs(1000) {  // TODO: Must be read from a config file
+      _writerTimeoutMsecs(writerTimeoutMsecs),
+      _trackLostFrameMax(trackLostFrameMax) {
 }
 
 SotCallback::~SotCallback() {
