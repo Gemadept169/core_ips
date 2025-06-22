@@ -19,8 +19,8 @@ class SotCallback : public CallbackBase,
     SotCallback& operator=(const SotCallback&) = delete;
     ~SotCallback();
 
-    grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* Track(grpc::CallbackServerContext* context,
-                                                                  const core_ips::sot::TrackRequest* request) override;
+    grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* TrackStart(grpc::CallbackServerContext* context,
+                                                                       const core_ips::sot::TrackRequest* request) override;
 
     grpc::ServerUnaryReactor* TrackStop(grpc::CallbackServerContext* context,
                                         const google::protobuf::Empty* request,

@@ -124,9 +124,8 @@ SotCallback::SotCallback(GrpcServer* grpcServer)
 SotCallback::~SotCallback() {
 }
 
-grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::Track(
-    grpc::CallbackServerContext* context,
-    const core_ips::sot::TrackRequest* request) {
+grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::TrackStart(grpc::CallbackServerContext* context,
+                                                                                const core_ips::sot::TrackRequest* request) {
     if (_isBusy.load()) {
         _isBusy.store(false);
     }

@@ -5,7 +5,7 @@ import "google/protobuf/empty.proto";
 package core_ips.sot;
 
 service Sot {
-    rpc Track(TrackRequest) returns (stream TrackResponse) {}
+    rpc TrackStart(TrackRequest) returns (stream TrackResponse) {}
     rpc TrackStop(google.protobuf.Empty) returns (google.protobuf.Empty) {}
 }
 
