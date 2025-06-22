@@ -10,10 +10,10 @@
 #include "sot_service.grpc.pb.h"
 #include "utilities/safequeue.h"
 
-class SotCallbackImpl;
+class TrackStartImpl;
 class SotCallback : public CallbackBase,
                     public core_ips::sot::Sot::CallbackService {
-    friend SotCallbackImpl;
+    friend TrackStartImpl;
 
    public:
     explicit SotCallback(GrpcServer* grpcServer);

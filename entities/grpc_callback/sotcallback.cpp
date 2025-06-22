@@ -2,9 +2,9 @@
 
 #include <QThread>
 
-class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
+class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
    public:
-    SotCallbackImpl(SotCallback* sotCallback, grpc::CallbackServerContext* context)
+    TrackStartImpl(SotCallback* sotCallback, grpc::CallbackServerContext* context)
         : _startingTimepoint(std::chrono::steady_clock::now()),
           _sotLostTrackCounter(0),
           _sotCallback(sotCallback),
@@ -31,7 +31,7 @@ class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResp
     }
 
     void OnDone() override {
-        std::cout << "[SotCallbackImpl] OnDone" << std::endl;
+        std::cout << "[TrackStartImpl] OnDone" << std::endl;
         if (_sotCallback && _sotCallback->grpcServer()) {
             QMetaObject::invokeMethod(_sotCallback->grpcServer(),
                                       &GrpcServer::hasSotTrackStop,
@@ -40,13 +40,13 @@ class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResp
         {
             std::unique_lock<std::mutex> lock(_sotCallback->_mu);
             _sotCallback->_cv.notify_one();
-            std::cout << "+==SotCallbackImpl free" << std::endl;
+            std::cout << "+==TrackStartImpl free" << std::endl;
         }
         delete this;
     }
 
     void OnCancel() override {
-        std::cout << "[SotCallbackImpl] OnCancel" << std::endl;
+        std::cout << "[TrackStartImpl] OnCancel" << std::endl;
     }
 
    private:
@@ -151,7 +151,7 @@ grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::TrackStart(
                                   incomingBox);
     }
     _dataQueue.clear();
-    return new SotCallbackImpl(this, context);
+    return new TrackStartImpl(this, context);
 }
 
 grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* context,
