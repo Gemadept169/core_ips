@@ -14,8 +14,8 @@ bool VideoReader::fromJson(const QJsonObject &json, VideoReader *&out, QObject *
         return false;
     }
     out = new VideoReader(parent);
-    out->_checker = new VideoChecker("rtsp://192.168.1.250:8555/cam", 1000, out);  // TODO: read config from QJsonObject
-    out->_worker = new CvVideoCapture("rtsp://192.168.1.250:8555/cam", 30, out);   // TODO: read config from QJsonObject
+    out->_checker = new VideoChecker("rtsp://192.168.1.8:8555/cam", 1000, out);  // TODO: read config from QJsonObject
+    out->_worker = new CvVideoCapture("rtsp://192.168.1.8:8555/cam", 30, out);   // TODO: read config from QJsonObject
     out->initConnections();
     return true;
 }

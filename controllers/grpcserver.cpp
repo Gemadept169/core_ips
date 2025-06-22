@@ -18,6 +18,14 @@ GrpcServer::GrpcServer(const std::string& hostname,
 GrpcServer::~GrpcServer() {
 }
 
+bool GrpcServer::fromJson(const QJsonObject& json, GrpcServer*& out, QObject* parent) {
+    if (out) {
+        return false;
+    }
+    out = new GrpcServer("localhost", 52124, parent);
+    return true;
+}
+
 void GrpcServer::atStarted() {
     startServer();
 }
@@ -38,7 +46,7 @@ void GrpcServer::setPort(const unsigned int& port) {
 
 void GrpcServer::startServer() {
     QThread* grpcThread = QThread::create([this]() -> void {
-        std::string server_address{"localhost:52124"};  // TODO: Must be read from a config file
+        std::string server_address = this->_hostname + std::string(":") + std::to_string(this->_port);
         grpc::ServerBuilder builder;
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
         builder.RegisterService(_sotCallback);

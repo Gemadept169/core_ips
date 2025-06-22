@@ -37,6 +37,11 @@ class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResp
                                       &GrpcServer::hasSotTrackStop,
                                       Qt::QueuedConnection);
         }
+        {
+            std::unique_lock<std::mutex> lock(_sotCallback->_mu);
+            _sotCallback->_cv.notify_one();
+            std::cout << "+==SotCallbackImpl free" << std::endl;
+        }
         delete this;
     }
 
@@ -51,7 +56,7 @@ class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResp
 
     bool _readDataFromQueueAndWriteToStream() {
         if (!_sotCallback) return false;
-        bool result{false};
+        bool result = false;
         for (;;) {
             if (_context->IsCancelled() || !_sotCallback->_isBusy.load()) {
                 _finishStatus = grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "Has new incoming request or cancellation signal");
@@ -59,7 +64,7 @@ class SotCallbackImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResp
                 break;
             }
 
-            if (_sotLostTrackCounter > 10) {  // TODO: must read from config file
+            if (_sotLostTrackCounter > 20) {  // TODO: must read from config file
                 _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over lost tracking");
                 result = false;
                 break;
@@ -118,7 +123,7 @@ SotCallback::SotCallback(GrpcServer* grpcServer)
     : CallbackBase(grpcServer),
       _isBusy(false),
       _dataQueue(SafeQueue<sot::SotInfo>()),
-      _streamTimeoutMsecs(5000) {  // TODO: Must be read from a config file
+      _streamTimeoutMsecs(1000) {  // TODO: Must be read from a config file
 }
 
 SotCallback::~SotCallback() {
@@ -126,9 +131,13 @@ SotCallback::~SotCallback() {
 
 grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::TrackStart(grpc::CallbackServerContext* context,
                                                                                 const core_ips::sot::TrackRequest* request) {
+    std::cout << "+==TrackStart new request" << std::endl;
     if (_isBusy.load()) {
         _isBusy.store(false);
+        std::unique_lock<std::mutex> lock(_mu);
+        _cv.wait(lock);
     }
+    std::cout << "+==TrackStart deleted old and init new task" << std::endl;
 
     if (grpcServer() && request != nullptr) {
         sot::BBox incomingBox;
@@ -148,9 +157,11 @@ grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::TrackStart(
 grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* context,
                                                  const google::protobuf::Empty* request,
                                                  google::protobuf::Empty* response) {
+    std::cout << "+==TrackStop new request" << std::endl;
     if (_isBusy.load()) {
         _isBusy.store(false);
     }
+    std::cout << "+==TrackStop stopped new task" << std::endl;
 
     if (grpcServer()) {
         QMetaObject::invokeMethod(grpcServer(),

@@ -2,14 +2,17 @@
 
 Session::Session(QObject* parent) : QObject(parent),
                                     _videoReader(nullptr),
-                                    _sotController(new SotController()),
-                                    _grpcServer(new GrpcServer("localhost", 1234)) {
+                                    _grpcServer(nullptr),
+                                    _sotController(new SotController()) {
     registerQMetaTypes();
 
-    _grpcServer->moveToThread(&_grpcThread);
-    _sotController->moveToThread(&_sotThread);
     VideoReader::fromJson(QJsonObject(), _videoReader);
+    GrpcServer::fromJson(QJsonObject(), _grpcServer);
+
     _videoReader->moveToThread(&_videoThread);
+    _sotController->moveToThread(&_sotThread);
+    _grpcServer->moveToThread(&_grpcThread);
+
     initObjectConnections();
     startThreads();
 }

@@ -20,6 +20,8 @@ class GrpcServer final : public QObject {
     GrpcServer &operator=(const GrpcServer &) = delete;
     ~GrpcServer();
 
+    static bool fromJson(const QJsonObject &json, GrpcServer *&out, QObject *parent = nullptr);
+
    signals:
     void hasSotTrackNewRequest(const sot::BBox &initBox);
     void hasSotTrackStop();

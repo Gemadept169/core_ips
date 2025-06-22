@@ -2,6 +2,8 @@
 #define GRPC_CALLBACK_SOTCALLBACK_H
 
 #include <atomic>
+#include <condition_variable>
+#include <mutex>
 
 #include "callbackbase.h"
 #include "sot/types.hpp"
@@ -30,6 +32,8 @@ class SotCallback : public CallbackBase,
 
    private:
     std::atomic_bool _isBusy;
+    std::condition_variable _cv;
+    std::mutex _mu;
     SafeQueue<sot::SotInfo> _dataQueue;
     std::chrono::milliseconds _streamTimeoutMsecs;
 };
