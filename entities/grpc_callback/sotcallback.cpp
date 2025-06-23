@@ -41,6 +41,7 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
             _sotCallback->_cv.notify_one();
             std::cout << "+==TrackStartImpl free" << std::endl;
         }
+        _sotCallback->_isBusy.store(false);
         delete this;
     }
 
@@ -117,7 +118,9 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
     std::chrono::steady_clock::time_point _startingTimepoint;
 };
 
-SotCallback::SotCallback(GrpcServer* grpcServer, const std::chrono::milliseconds& writerTimeoutMsecs, const unsigned int& trackLostFrameMax)
+SotCallback::SotCallback(GrpcServer* grpcServer,
+                         const std::chrono::milliseconds& writerTimeoutMsecs,
+                         const unsigned int& trackLostFrameMax)
     : CallbackBase(grpcServer),
       _isBusy(false),
       _dataQueue(SafeQueue<sot::SotInfo>()),
@@ -128,8 +131,9 @@ SotCallback::SotCallback(GrpcServer* grpcServer, const std::chrono::milliseconds
 SotCallback::~SotCallback() {
 }
 
-grpc::ServerWriteReactor<core_ips::sot::TrackResponse>* SotCallback::TrackStart(grpc::CallbackServerContext* context,
-                                                                                const core_ips::sot::TrackRequest* request) {
+grpc::ServerWriteReactor<core_ips::sot::TrackResponse>*
+SotCallback::TrackStart(grpc::CallbackServerContext* context,
+                        const core_ips::sot::TrackRequest* request) {
     std::cout << "+==TrackStart new request" << std::endl;
     if (_isBusy.load()) {
         _isBusy.store(false);
