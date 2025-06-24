@@ -3,8 +3,6 @@
 
 #include <QObject>
 #include <QTimer>
-#include <opencv2/core.hpp>
-#include <opencv2/videoio.hpp>
 
 class VideoChecker : public QObject {
     Q_OBJECT
@@ -24,7 +22,6 @@ class VideoChecker : public QObject {
     void checkConnection();
 
    private:
-    cv::Ptr<cv::VideoCapture> _cap;
     uint _retryIntervalMsec;
     QString _rtspPath;
     QTimer *_retryTimer;

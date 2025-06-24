@@ -58,6 +58,11 @@ void Session::initObjectConnections() {
 
     QObject::connect(&_videoThread, &QThread::started, _videoReader, &VideoReader::atStarted);
     QObject::connect(&_videoThread, &QThread::finished, _videoReader, &VideoReader::deleteLater);
+    QObject::connect(_videoReader, &VideoReader::hasVideoIsConnected, [this](const bool& isConnected) -> void {
+        if (!isConnected) {
+            handleSotTrackStopRequest();
+        }
+    });
 
     QObject::connect(&_sotThread, &QThread::started, _sotController, &SotController::atStarted);
     QObject::connect(&_sotThread, &QThread::finished, _sotController, &SotController::deleteLater);

@@ -1,10 +1,39 @@
 #include "videochecker.h"
 
+#include <QByteArray>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QProcess>
+#include <QString>
+
+namespace {
+bool checkRtspServerIsAvailable(const QString &rtspPath) {
+    bool isOk = false;
+    QProcess ffprobe;
+    QObject::connect(&ffprobe, &QProcess::readyReadStandardOutput,
+                     [&isOk, &ffprobe]() -> void {
+                         const QString out(ffprobe.readAllStandardOutput().simplified());
+                         if (out.contains("\"width\": 1920") &&
+                             out.contains("\"height\": 1080") &&
+                             out.contains("\"codec_type\": \"video\"") &&
+                             out.contains("\"format_name\": \"rtsp\"")) {
+                             isOk = true;
+                         }
+                     });
+    ffprobe.start("ffprobe", QStringList() << "-v" << "error"
+                                           << "-show_streams"
+                                           << "-show_format"
+                                           << "-of" << "json"
+                                           << "-i" << rtspPath);
+    ffprobe.waitForFinished(5000);
+    ffprobe.close();
+    return isOk;
+};
+}  // namespace
 
 VideoChecker::VideoChecker(const QString &rtspPath, const uint &retryIntervalMsec, QObject *parent)
     : QObject(parent),
-      _cap(new cv::VideoCapture()),
       _retryTimer(new QTimer(this)),
       _rtspPath(rtspPath),
       _retryIntervalMsec(retryIntervalMsec) {
@@ -24,26 +53,11 @@ void VideoChecker::atVideoDisconnected() {
 
 void VideoChecker::checkConnection() {
     qDebug() << "[VideoChecker::checkConnection]";
-    emit hasVideoConnected();
-    if (_retryTimer && _retryTimer->isActive()) {
-        _retryTimer->stop();
+    if (checkRtspServerIsAvailable(_rtspPath)) {
+        qDebug() << "[VideoChecker::checkConnection] Video is connected";
+        emit hasVideoConnected();
+        if (_retryTimer && _retryTimer->isActive()) {
+            _retryTimer->stop();
+        }
     }
 }
-
-// void VideoChecker::checkConnection() {
-//     qDebug() << "[VideoChecker::checkConnection]";
-//     if (_cap->open(QString("rtspsrc location=%1 "
-//                            "! appsink")
-//                        .arg(_rtspPath)
-//                        .toUtf8()
-//                        .constData(),
-//                    cv::CAP_GSTREAMER)) {
-//         qDebug() << "[VideoChecker::checkConnection] Video is connected";
-//         emit hasVideoConnected();
-//         if (_retryTimer && _retryTimer->isActive()) {
-//             _retryTimer->stop();
-//         }
-//     } else {
-//         _cap->release();
-//     }
-// }

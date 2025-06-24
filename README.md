@@ -25,6 +25,11 @@
 - [x] Make grpc communication completely (at both server and client sides)
   - [x] Add new TrackStop to stop all tasks in SotController at server-side
   - [x] Rewrite client-side with the new api (don't use await)
+- [ ] Fix bug handleSotTrackStopRequest at Session when disconnected video streaming.
+- [x] Complete VideoChecker
+- [ ] Complete Process release the software (copy files, install dependencies, ...)
+- [ ] Write json config parser based on Qt example for game (search TODO tags)
+
 - [ ] Test bottleneck 
   - [ ] Calculate frame reading rate from rtsp to opencv
   - [ ] Calculate sot processing time
@@ -33,7 +38,6 @@
 - [ ] Optimize the gst pipeline for capturing video
   - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
   - [ ] Auto reconnecting when rtsp streaming failed
-- [ ] Write json config parser based on Qt example for game (search TODO tags)
 
 # Introduction
 - A Back-end service for image processing.
