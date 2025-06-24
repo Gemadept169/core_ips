@@ -32,8 +32,11 @@ class SotCallback : public CallbackBase,
 
     void pushResultData(const sot::SotInfo& info);
 
+    void setIsVideoConnected(const bool& isConnected);
+
    private:
     std::atomic_bool _isBusy;
+    std::atomic_bool _isVideoConnected;
     std::condition_variable _cv;
     std::mutex _mu;
     SafeQueue<sot::SotInfo> _dataQueue;

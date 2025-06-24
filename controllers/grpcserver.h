@@ -29,6 +29,7 @@ class GrpcServer final : public QObject {
    public slots:
     void atStarted();
     void atSotResults(const sot::SotInfo &info);
+    void atVideoIsConnected(const bool &isConnected);
 
    private:
     void setHostname(const std::string &hostname);

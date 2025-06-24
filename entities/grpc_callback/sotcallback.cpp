@@ -57,12 +57,21 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
     bool _readDataFromQueueAndWriteToStream() {
         bool result = false;
         for (;;) {
-            if (_context->IsCancelled() || !_sotCallback->_isBusy.load()) {
-                _finishStatus = grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "Has new incoming request or cancellation signal");
+            if (_context->IsCancelled()) {
+                _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Cancellation signal from context");
                 result = false;
                 break;
             }
-
+            if (!_sotCallback->_isBusy.load()) {
+                _finishStatus = grpc::Status(grpc::StatusCode::RESOURCE_EXHAUSTED, "New incoming request");
+                result = false;
+                break;
+            }
+            if (!_sotCallback->_isVideoConnected.load()) {
+                _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Video streaming is disconnected");
+                result = false;
+                break;
+            }
             if (_trackLostFrameCounter >= _trackLostFrameMax) {
                 _finishStatus = grpc::Status(grpc::StatusCode::CANCELLED, "Over lost tracking");
                 result = false;
@@ -123,6 +132,7 @@ SotCallback::SotCallback(GrpcServer* grpcServer,
                          const unsigned int& trackLostFrameMax)
     : CallbackBase(grpcServer),
       _isBusy(false),
+      _isVideoConnected(true),
       _dataQueue(SafeQueue<sot::SotInfo>()),
       _writerTimeoutMsecs(writerTimeoutMsecs),
       _trackLostFrameMax(trackLostFrameMax) {
@@ -179,4 +189,10 @@ grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* co
 
 void SotCallback::pushResultData(const sot::SotInfo& info) {
     _dataQueue.pushBack(info);
+}
+
+void SotCallback::setIsVideoConnected(const bool& isConnected) {
+    if (_isVideoConnected.load() != isConnected) {
+        _isVideoConnected.store(isConnected);
+    }
 }

@@ -25,8 +25,9 @@
 - [x] Make grpc communication completely (at both server and client sides)
   - [x] Add new TrackStop to stop all tasks in SotController at server-side
   - [x] Rewrite client-side with the new api (don't use await)
-- [ ] Fix bug handleSotTrackStopRequest at Session when disconnected video streaming.
+- [x] Fix bug handleSotTrackStopRequest at Session when disconnected video streaming.
 - [x] Complete VideoChecker
+- [x] Finish the current writer at grpc when disconnected video streaming (push error grpc error code and stop)
 - [ ] Complete Process release the software (copy files, install dependencies, ...)
 - [ ] Write json config parser based on Qt example for game (search TODO tags)
 

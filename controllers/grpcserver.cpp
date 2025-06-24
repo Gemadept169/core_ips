@@ -36,6 +36,10 @@ void GrpcServer::atSotResults(const sot::SotInfo& info) {
     }
 }
 
+void GrpcServer::atVideoIsConnected(const bool& isConnected) {
+    _sotCallback->setIsVideoConnected(isConnected);
+}
+
 void GrpcServer::setHostname(const std::string& hostname) {
     _hostname = hostname;
 }
