@@ -72,14 +72,11 @@ message("[${CMAKE_PROJECT_NAME}] [sot] version: ${Sot_VERSION}")
 message("[${CMAKE_PROJECT_NAME}] [sot] include: ${Sot_INCLUDE_DIRS}")
 message("[${CMAKE_PROJECT_NAME}] [sot] libraries: ${Sot_LIBRARIES}")
 
-##############################################################################
-### FOR THE DEBUG PURPOSE
-##############################################################################
-get_property(imported_targets_after DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-message("[${CMAKE_PROJECT_NAME}] Imported targets: ${imported_targets_after}")
-
 add_subdirectory(controllers)
 add_subdirectory(entities)
 add_subdirectory(main)
 add_subdirectory(api)
 add_subdirectory(utilities)
+
+include(cmake/utilities.cmake)
+install_core_ips_and_dependencies()
