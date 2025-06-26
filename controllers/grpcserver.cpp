@@ -1,6 +1,8 @@
 #include "grpcserver.h"
 
 #include <QDebug>
+#include <QJsonObject>
+#include <QJsonValue>
 
 #include "entities/grpc_callback/sotcallback.h"
 
@@ -21,9 +23,52 @@ GrpcServer::~GrpcServer() {
 bool GrpcServer::fromJson(const QJsonObject& json, GrpcServer*& out, QObject* parent) {
     if (out) {
         return false;
+        delete out;
+        out = nullptr;
     }
-    out = new GrpcServer("localhost", 52124, parent);
-    return true;
+
+    bool isOk = true;
+    QString ipv4;
+    unsigned int port;
+    QJsonObject hostJson = json.value("host").toObject();
+    if (const QJsonValue v = hostJson["ipv4"]; v.isString())
+        ipv4 = v.toString();
+    else
+        isOk = false;
+    if (const QJsonValue v = hostJson["port"]; v.isDouble())
+        port = static_cast<unsigned int>(v.toInt());
+    else
+        isOk = false;
+
+    unsigned int writerTimeoutMsecs;
+    unsigned int trackLostFrameMax;
+    QJsonObject sotCbJson = json.value("sotCallback").toObject();
+    if (const QJsonValue v = sotCbJson["writerTimeoutMsecs"]; v.isDouble())
+        writerTimeoutMsecs = static_cast<unsigned int>(v.toInt());
+    else
+        isOk = false;
+    if (const QJsonValue v = sotCbJson["trackLostFrameMax"]; v.isDouble())
+        trackLostFrameMax = static_cast<unsigned int>(v.toInt());
+    else
+        isOk = false;
+
+    qDebug() << "+== GrpcServer" << ipv4 << port << writerTimeoutMsecs << trackLostFrameMax;
+    out = new GrpcServer(ipv4.toStdString(), port, parent);
+    out->setSotCbWriterTimeoutMsecs(writerTimeoutMsecs);
+    out->setSotCbTrackLostFrameMax(trackLostFrameMax);
+    return isOk;
+}
+
+void GrpcServer::setSotCbTrackLostFrameMax(const unsigned int& frameMax) {
+    if (_sotCallback) {
+        _sotCallback->setTrackLostFrameMax(frameMax);
+    }
+}
+
+void GrpcServer::setSotCbWriterTimeoutMsecs(const unsigned int& msec) {
+    if (_sotCallback) {
+        _sotCallback->setWriterTimeoutMsecs(msec);
+    }
 }
 
 void GrpcServer::atStarted() {

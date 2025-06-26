@@ -1,0 +1,5 @@
+{
+    "rtspSource": "rtsp://192.168.1.250:8555/cam",
+    "retryIntervalMsec": 1000,
+    "videoFps": 30
+}

@@ -1,0 +1,10 @@
+{
+    "host": {
+        "ipv4": "localhost",
+        "port": 52124
+    },
+    "sotCallback": {
+        "writerTimeoutMsecs": 1000,
+        "trackLostFrameMax": 20
+    }
+}

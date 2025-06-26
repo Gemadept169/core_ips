@@ -37,7 +37,7 @@ VideoChecker::VideoChecker(const QString &rtspPath, const uint &retryIntervalMse
       _retryTimer(new QTimer(this)),
       _rtspPath(rtspPath),
       _retryIntervalMsec(retryIntervalMsec) {
-    _retryTimer->setInterval(_retryIntervalMsec);  // TODO: must be read from config file
+    _retryTimer->setInterval(_retryIntervalMsec);
     QObject::connect(_retryTimer, &QTimer::timeout, this, &VideoChecker::checkConnection);
 }
 

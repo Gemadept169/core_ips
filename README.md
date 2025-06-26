@@ -28,9 +28,8 @@
 - [x] Fix bug handleSotTrackStopRequest at Session when disconnected video streaming.
 - [x] Complete VideoChecker
 - [x] Finish the current writer at grpc when disconnected video streaming (push error grpc error code and stop)
-- [ ] Complete Process release the software (copy files, install dependencies, ...)
-- [ ] Write json config parser based on Qt example for game (search TODO tags)
-
+- [x] Complete Process release the software (copy files, install dependencies, ...)
+- [x] Write json config parser based on Qt example for game (search TODO tags)
 - [ ] Test bottleneck 
   - [ ] Calculate frame reading rate from rtsp to opencv
   - [ ] Calculate sot processing time

@@ -22,6 +22,10 @@ class GrpcServer final : public QObject {
 
     static bool fromJson(const QJsonObject &json, GrpcServer *&out, QObject *parent = nullptr);
 
+    void setSotCbTrackLostFrameMax(const unsigned int& frameMax);
+
+    void setSotCbWriterTimeoutMsecs(const unsigned int& msec);
+
    signals:
     void hasSotTrackNewRequest(const sot::BBox &initBox);
     void hasSotTrackStop();

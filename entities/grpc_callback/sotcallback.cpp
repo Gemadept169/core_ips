@@ -196,3 +196,11 @@ void SotCallback::setIsVideoConnected(const bool& isConnected) {
         _isVideoConnected.store(isConnected);
     }
 }
+
+void SotCallback::setTrackLostFrameMax(const unsigned int& frameMax) {
+    _trackLostFrameMax = frameMax;
+}
+
+void SotCallback::setWriterTimeoutMsecs(const unsigned int& msec) {
+    _writerTimeoutMsecs = std::chrono::milliseconds(msec);
+}

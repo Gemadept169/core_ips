@@ -1,13 +1,16 @@
 #include "session.h"
 
+#include <QDebug>
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+
 Session::Session(QObject* parent) : QObject(parent),
                                     _videoReader(nullptr),
                                     _grpcServer(nullptr),
                                     _sotController(new SotController()) {
     registerQMetaTypes();
-
-    VideoReader::fromJson(QJsonObject(), _videoReader);
-    GrpcServer::fromJson(QJsonObject(), _grpcServer);
+    loadSession();
 
     _videoReader->moveToThread(&_videoThread);
     _sotController->moveToThread(&_sotThread);
@@ -67,6 +70,26 @@ void Session::initObjectConnections() {
 
     QObject::connect(&_sotThread, &QThread::started, _sotController, &SotController::atStarted);
     QObject::connect(&_sotThread, &QThread::finished, _sotController, &SotController::deleteLater);
+}
+
+void Session::loadSession() {
+    QFile videoCfgFile("../configs/videoreader.json");
+    if (!videoCfgFile.open(QIODevice::ReadOnly)) {
+        qFatal() << "[Session] Couldn't open videoreader.json";
+    }
+    const auto videoCfgDoc(QJsonDocument::fromJson(videoCfgFile.readAll()));
+    if (!VideoReader::fromJson(videoCfgDoc.object(), _videoReader)) {
+        qFatal() << "[Session] Load config for VideoReader failed";
+    };
+
+    QFile grpcCfgFile("../configs/grpcserver.json");
+    if (!grpcCfgFile.open(QIODevice::ReadOnly)) {
+        qFatal() << "[Session] Couldn't open grpcserver.json";
+    }
+    const auto grpcCfgDoc(QJsonDocument::fromJson(grpcCfgFile.readAll()));
+    if (!GrpcServer::fromJson(grpcCfgDoc.object(), _grpcServer)) {
+        qFatal() << "[Session] Load config for GrpcServer failed";
+    };
 }
 
 void Session::startThreads() {

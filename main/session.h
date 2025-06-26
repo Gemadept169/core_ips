@@ -26,10 +26,10 @@ class Session : public QObject {
    private:
     void registerQMetaTypes();
     void initObjectConnections();
+    void loadSession();
     void startThreads();
     void quitThreads();
 
-   private:
     QThread _grpcThread;
     QThread _videoThread;
     QThread _sotThread;

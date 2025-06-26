@@ -12,12 +12,33 @@ VideoReader::~VideoReader() {
 bool VideoReader::fromJson(const QJsonObject &json, VideoReader *&out, QObject *parent) {
     if (out) {
         return false;
+        delete out;
+        out = nullptr;
     }
     out = new VideoReader(parent);
-    out->_checker = new VideoChecker("rtsp://192.168.1.250:8555/cam", 1000, out);  // TODO: read config from QJsonObject
-    out->_worker = new CvVideoCapture("rtsp://192.168.1.250:8555/cam", 30, out);   // TODO: read config from QJsonObject
+
+    bool isOk = true;
+    QString rtspSource;
+    uint retryIntervalMsec;
+    uint fps;
+
+    if (const QJsonValue v = json["rtspSource"]; v.isString())
+        rtspSource = v.toString();
+    else
+        isOk = false;
+    if (const QJsonValue v = json["retryIntervalMsec"]; v.isDouble())
+        retryIntervalMsec = static_cast<unsigned int>(v.toInt());
+    else
+        isOk = false;
+    if (const QJsonValue v = json["videoFps"]; v.isDouble())
+        fps = static_cast<unsigned int>(v.toInt());
+    else
+        isOk = false;
+
+    out->_checker = new VideoChecker(rtspSource, retryIntervalMsec, out);
+    out->_worker = new CvVideoCapture(rtspSource, fps, out);
     out->initConnections();
-    return true;
+    return isOk;
 }
 
 void VideoReader::atStarted() {

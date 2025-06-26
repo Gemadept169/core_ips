@@ -34,6 +34,10 @@ class SotCallback : public CallbackBase,
 
     void setIsVideoConnected(const bool& isConnected);
 
+    void setTrackLostFrameMax(const unsigned int& frameMax);
+
+    void setWriterTimeoutMsecs(const unsigned int& msec);
+
    private:
     std::atomic_bool _isBusy;
     std::atomic_bool _isVideoConnected;
