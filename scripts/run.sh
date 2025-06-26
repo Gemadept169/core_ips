@@ -8,4 +8,4 @@ fi
 
 export LD_LIBRARY_PATH=$dirname/lib
 export SOT_DATA_PATH=$dirname/data/sot
-$dirname/bin/core_ips
+cd $dirname/bin && ./core_ips
