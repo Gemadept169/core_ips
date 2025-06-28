@@ -8,13 +8,15 @@
 Session::Session(QObject* parent) : QObject(parent),
                                     _videoReader(nullptr),
                                     _grpcServer(nullptr),
-                                    _sotController(new SotController()) {
+                                    _sotController(new SotController()),
+                                    _systemMonitor(new SystemMonitor()) {
     registerQMetaTypes();
     loadSession();
 
     _videoReader->moveToThread(&_videoThread);
     _sotController->moveToThread(&_sotThread);
     _grpcServer->moveToThread(&_grpcThread);
+    _systemMonitor->moveToThread(&_systemThread);
 
     initObjectConnections();
     startThreads();
@@ -70,6 +72,8 @@ void Session::initObjectConnections() {
 
     QObject::connect(&_sotThread, &QThread::started, _sotController, &SotController::atStarted);
     QObject::connect(&_sotThread, &QThread::finished, _sotController, &SotController::deleteLater);
+
+    QObject::connect(&_systemThread, &QThread::finished, _systemMonitor, &SotController::deleteLater);
 }
 
 void Session::loadSession() {
@@ -96,6 +100,7 @@ void Session::startThreads() {
     _grpcThread.start();
     _videoThread.start();
     _sotThread.start();
+    _systemThread.start();
 }
 
 void Session::quitThreads() {
@@ -107,4 +112,7 @@ void Session::quitThreads() {
 
     _sotThread.quit();
     _sotThread.wait();
+
+    _systemThread.quit();
+    _systemThread.wait();
 }

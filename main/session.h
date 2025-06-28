@@ -9,6 +9,7 @@
 
 #include "controllers/grpcserver.h"
 #include "controllers/sotcontroller.h"
+#include "controllers/systemmonitor.h"
 #include "controllers/videoreader.h"
 
 class Session : public QObject {
@@ -33,10 +34,12 @@ class Session : public QObject {
     QThread _grpcThread;
     QThread _videoThread;
     QThread _sotThread;
+    QThread _systemThread;
 
     GrpcServer *_grpcServer;
     VideoReader *_videoReader;
     SotController *_sotController;
+    SystemMonitor *_systemMonitor;
 };
 
 #endif
