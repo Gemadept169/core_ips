@@ -30,11 +30,12 @@
 - [x] Finish the current writer at grpc when disconnected video streaming (push error grpc error code and stop)
 - [x] Complete Process release the software (copy files, install dependencies, ...)
 - [x] Write json config parser based on Qt example for game (search TODO tags)
-- [ ] Test bottleneck 
-  - [ ] Calculate frame reading rate from rtsp to opencv
-  - [ ] Calculate sot processing time
-  - [ ] Calculate delay all process
-  - [ ] Test leak memory
+- [x] Test bottleneck 
+  - [x] Calculate frame reading rate from rtsp to opencv
+  - [x] Calculate sot processing time
+  - [x] Calculate delay all process
+  - [x] Test leak memory
+- [ ] Implement logging system
 - [ ] Optimize the gst pipeline for capturing video
   - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
   - [ ] Auto reconnecting when rtsp streaming failed
