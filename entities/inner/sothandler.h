@@ -1,8 +1,6 @@
 #ifndef ENTITIES_SOTHANDLER_H
 #define ENTITIES_SOTHANDLER_H
 
-#include <QDebug>
-#include <QMetaObject>
 #include <QObject>
 
 #include "sot/interfaces.hpp"

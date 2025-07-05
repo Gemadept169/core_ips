@@ -3,7 +3,6 @@
 
 #include <QJsonObject>
 #include <QMetaObject>
-#include <QSharedPointer>
 
 #include "entities/video_capture/cvvideocapture.h"
 #include "entities/video_capture/videochecker.h"

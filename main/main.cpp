@@ -1,12 +1,4 @@
 #include <QCoreApplication>
-#include <QDebug>
-#include <QPointer>
-#include <QSettings>
-#include <QString>
-#include <iostream>
-#include <opencv2/core.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgcodecs.hpp>
 
 #include "session.h"
 

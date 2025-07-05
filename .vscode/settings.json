@@ -72,7 +72,10 @@
         "typeinfo": "cpp",
         "*.inc": "cpp",
         "qthread": "cpp",
-        "qprocess": "cpp"
+        "qprocess": "cpp",
+        "qtimer": "cpp",
+        "qsharedpointer": "cpp",
+        "qobject": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",

@@ -7,7 +7,6 @@
 #include <grpcpp/server_builder.h>
 #include <grpcpp/server_context.h>
 
-#include <QMetaObject>
 #include <QPointer>
 
 #include "controllers/grpcserver.h"

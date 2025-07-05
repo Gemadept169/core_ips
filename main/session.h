@@ -1,11 +1,8 @@
 #ifndef MAIN_SESSION_H
 #define MAIN_SESSION_H
 
-#include <QMetaObject>
 #include <QObject>
-#include <QSharedPointer>
 #include <QThread>
-#include <QTimer>
 
 #include "controllers/grpcserver.h"
 #include "controllers/sotcontroller.h"

@@ -1,6 +1,7 @@
 #include "grpcserver.h"
 
 #include <QDebug>
+#include <QThread>
 #include <QJsonObject>
 #include <QJsonValue>
 

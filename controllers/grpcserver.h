@@ -1,12 +1,9 @@
 #ifndef CONTROLLER_GRPCSERVER_H
 #define CONTROLLER_GRPCSERVER_H
 
-#include <grpc/grpc.h>
 #include <grpcpp/server.h>
 
 #include <QObject>
-#include <QPointer>
-#include <QThread>
 #include <memory>
 
 #include "sot/types.hpp"
@@ -22,9 +19,9 @@ class GrpcServer final : public QObject {
 
     static bool fromJson(const QJsonObject &json, GrpcServer *&out, QObject *parent = nullptr);
 
-    void setSotCbTrackLostFrameMax(const unsigned int& frameMax);
+    void setSotCbTrackLostFrameMax(const unsigned int &frameMax);
 
-    void setSotCbWriterTimeoutMsecs(const unsigned int& msec);
+    void setSotCbWriterTimeoutMsecs(const unsigned int &msec);
 
    signals:
     void hasSotTrackNewRequest(const sot::BBox &initBox);

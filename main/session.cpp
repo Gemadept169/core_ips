@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QMetaObject>
 
 Session::Session(QObject* parent) : QObject(parent),
                                     _videoReader(nullptr),

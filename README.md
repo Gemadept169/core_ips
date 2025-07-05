@@ -7,8 +7,9 @@
     - [System](#system)
     - [Preparation](#preparation)
     - [Qt6](#qt6)
-    - [Build and release OpenCV](#build-and-release-opencv)
-    - [Build and install gRPC library and dependencies](#build-and-install-grpc-library-and-dependencies)
+    - [Build and release OpenCV library](#build-and-release-opencv-library)
+    - [Build and release gRPC library](#build-and-release-grpc-library)
+    - [Build and release spdlog library](#build-and-release-spdlog-library)
     - [Discard write permission for all release folders](#discard-write-permission-for-all-release-folders)
   - [At the second times](#at-the-second-times)
     - [Preparation](#preparation-1)
@@ -35,7 +36,8 @@
   - [x] Calculate sot processing time
   - [x] Calculate delay all process
   - [x] Test leak memory
-- [ ] Implement logging system
+- [ ] Implement logging system (choose between two options: print to console or save to file (based on config file))
+- [ ] Synchronize timezone automatically by chrony 
 - [ ] Optimize the gst pipeline for capturing video
   - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
   - [ ] Auto reconnecting when rtsp streaming failed
@@ -77,7 +79,7 @@ sudo apt -y install libeigen3-dev libfreetype-dev libharfbuzz-dev cmake libboost
 
 ### Qt6
 - Crawl Qt framwork corresponding to the machine architecture at <global_path> (following pattern [Folder structure](#folder-structure)).
-### Build and release OpenCV 
+### Build and release OpenCV library
 - To query the number of compute capability of the GPU in the machine architecture. It server to pass to the CUDA_ARCH_BIN argument.
 ```
 nvidia-smi --query-gpu=compute_cap --format=csv # query compute capability of the GPU
@@ -125,10 +127,9 @@ cmake \
 make install -j$(nproc)
 ldconfig
 ```
-### Build and install gRPC library and dependencies
+### Build and release gRPC library
 - Refer: https://github.com/grpc/grpc/blob/master/src/cpp/README.md and https://github.com/grpc/grpc/blob/master/BUILDING.md
 ```
-git clone -b RELEASE_TAG_HERE https://github.com/grpc/grpc
 git clone -b v1.66.1 https://github.com/grpc/grpc
 cd grpc/
 git submodule update --init
@@ -144,6 +145,18 @@ cmake  \
 make -j7
 make install
 ```
+
+### Build and release spdlog library
+```
+git clone -b v1.15.3 https://github.com/gabime/spdlog.git
+cd spdlog && mkdir build && cd build
+cmake  \
+    -DCMAKE_INSTALL_PREFIX=<global_path>/3rdparty/spdlog \
+    ..
+cmake --build .
+make install
+```
+
 
 ### Discard write permission for all release folders
 ```

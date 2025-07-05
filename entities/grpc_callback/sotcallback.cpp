@@ -1,5 +1,6 @@
 #include "sotcallback.h"
 
+#include <QMetaObject>
 #include <QThread>
 
 class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackResponse> {
