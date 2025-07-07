@@ -2,7 +2,7 @@ macro(install_core_ips_and_dependencies)
     install(IMPORTED_RUNTIME_ARTIFACTS sot::sot_base sot::sot_factory sot::sot_siamrpn)
     install(IMPORTED_RUNTIME_ARTIFACTS opencv_core opencv_videoio opencv_imgproc opencv_imgcodecs)
     get_property(importedTargetsAfter DIRECTORY "${CMAKE_SOURCE_DIR}" PROPERTY IMPORTED_TARGETS)
-    message("[${CMAKE_PROJECT_NAME}] Imported targets: ${importedTargetsAfter}")
+    # message("[${CMAKE_PROJECT_NAME}] Imported targets: ${importedTargetsAfter}")
     set(grpcImportedTargets "")
     foreach(target IN LISTS importedTargetsAfter)
     if(target MATCHES "^gRPC::" OR 

@@ -75,7 +75,10 @@
         "qprocess": "cpp",
         "qtimer": "cpp",
         "qsharedpointer": "cpp",
-        "qobject": "cpp"
+        "qobject": "cpp",
+        "charconv": "cpp",
+        "hash_map": "cpp",
+        "filesystem": "cpp"
     },
     "editor.formatOnSave": true,
     "C_Cpp.clang_format_fallbackStyle": "{BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",

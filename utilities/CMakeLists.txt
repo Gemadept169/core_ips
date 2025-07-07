@@ -1,6 +1,6 @@
-file(GLOB_RECURSE utilities_sources *.cpp)
+file(GLOB_RECURSE sources *.cpp)
 qt_add_library(utilities STATIC
-    ${utilities_sources}
+    ${sources}
 )
 target_link_libraries(utilities 
     PUBLIC Qt6::Core)

@@ -1,11 +1,12 @@
 #include "grpcserver.h"
 
 #include <QDebug>
-#include <QThread>
 #include <QJsonObject>
 #include <QJsonValue>
+#include <QThread>
 
 #include "entities/grpc_callback/sotcallback.h"
+#include "utilities/logger.h"
 
 #define DEBUG_PREFIX_GRPCSERVER "[GrpcServer]"
 
@@ -53,7 +54,6 @@ bool GrpcServer::fromJson(const QJsonObject& json, GrpcServer*& out, QObject* pa
     else
         isOk = false;
 
-    qDebug() << "+== GrpcServer" << ipv4 << port << writerTimeoutMsecs << trackLostFrameMax;
     out = new GrpcServer(ipv4.toStdString(), port, parent);
     out->setSotCbWriterTimeoutMsecs(writerTimeoutMsecs);
     out->setSotCbTrackLostFrameMax(trackLostFrameMax);
@@ -101,7 +101,7 @@ void GrpcServer::startServer() {
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
         builder.RegisterService(_sotCallback);
         _server = builder.BuildAndStart();
-        qDebug() << DEBUG_PREFIX_GRPCSERVER << "Server listening on" << server_address;
+        LOG_INFO(QString("Grpc server listening on %1").arg(QString::fromStdString(server_address)));
         _server->Wait();
     });
     QObject::connect(grpcThread, &QThread::finished, grpcThread, &QThread::deleteLater);

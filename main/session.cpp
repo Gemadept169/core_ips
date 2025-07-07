@@ -6,6 +6,8 @@
 #include <QJsonObject>
 #include <QMetaObject>
 
+#include "utilities/logger.h"
+
 Session::Session(QObject* parent) : QObject(parent),
                                     _videoReader(nullptr),
                                     _grpcServer(nullptr),
@@ -18,9 +20,11 @@ Session::Session(QObject* parent) : QObject(parent),
     _sotController->moveToThread(&_sotThread);
     _grpcServer->moveToThread(&_grpcThread);
     _systemMonitor->moveToThread(&_systemThread);
+    LOG_INSTACE.moveToThread(&_systemThread);
 
     initObjectConnections();
     startThreads();
+    LOG_INFO("Wellcome new session!");
 }
 
 Session::~Session() {

@@ -4,4 +4,4 @@ qt_add_library(controllers STATIC
 )
 target_include_directories(controllers PUBLIC ${CMAKE_SOURCE_DIR})
 target_link_libraries(controllers PUBLIC 
-    entities Qt6::Core gRPC::grpc++)
+    entities Qt6::Core gRPC::grpc++ utilities)
