@@ -13,10 +13,11 @@ class Power {
     ~Power();
 
     void refresh();
-    friend std::ostream &operator<<(std::ostream &out, const Power &temp);
+    friend std::ostream &operator<<(std::ostream &out, const Power &power);
 
    private:
     std::map<std::string, float> _data;
+    uint _railNums;
 };
 
 #endif

@@ -11,6 +11,7 @@ class Temperature {
     Temperature(const Temperature &) = delete;
     Temperature &operator=(const Temperature &) = delete;
     ~Temperature();
+
     void refresh();
     friend std::ostream &operator<<(std::ostream &out, const Temperature &temp);
 
