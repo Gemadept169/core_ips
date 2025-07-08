@@ -1,6 +1,6 @@
 #include "cvvideocapture.h"
 
-#include <QDebug>
+#include "utilities/logger.h"
 
 CvVideoCapture::CvVideoCapture(const QString &rtspPath, const uint &fps, QObject *parent)
     : QObject(parent),
@@ -16,7 +16,6 @@ CvVideoCapture::~CvVideoCapture() {
 }
 
 void CvVideoCapture::startCapture() {
-    qDebug() << "[CvVideoCapture::startCapture]";
     if (_cap->isOpened()) {
         stopCapture();
     }
@@ -35,9 +34,9 @@ void CvVideoCapture::startCapture() {
         if (_readTimer && !_readTimer->isActive()) {
             _readTimer->start();
         }
-        qDebug() << "[CvVideoCapture::startCapture] Opened rtsp stream by Gstreamer";
+        LOG_INFO("Opened rtsp stream and start capturing");
     } else {
-        qDebug() << "[CvVideoCapture::startCapture] Disconnected rtsp stream by Gstreamer";
+        LOG_WARN("Opening rtsp stream failed!");
         emit hasVideoDisconnected();
     }
 }
@@ -57,7 +56,7 @@ void CvVideoCapture::readFrame() {
         emit hasVideoNewFrame(incomingFrame);
     } else {
         stopCapture();
-        qDebug() << "[CvVideoCapture::readFrame] can't read frame";
+        LOG_WARN("Can't read new frame");
         emit hasVideoDisconnected();
     }
 }

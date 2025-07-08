@@ -11,7 +11,6 @@ VideoReader::~VideoReader() {
 
 bool VideoReader::fromJson(const QJsonObject &json, VideoReader *&out, QObject *parent) {
     if (out) {
-        return false;
         delete out;
         out = nullptr;
     }
@@ -42,7 +41,6 @@ bool VideoReader::fromJson(const QJsonObject &json, VideoReader *&out, QObject *
 }
 
 void VideoReader::atStarted() {
-    qDebug() << "[VideoReader::atStarted]";
     _worker->startCapture();
 }
 

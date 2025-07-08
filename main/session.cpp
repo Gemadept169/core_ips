@@ -24,7 +24,7 @@ Session::Session(QObject* parent) : QObject(parent),
 
     initObjectConnections();
     startThreads();
-    LOG_INFO("Wellcome new session!");
+    LOG_INFO("Wellcome to new session!");
 }
 
 Session::~Session() {

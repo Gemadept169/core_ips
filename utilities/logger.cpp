@@ -11,7 +11,7 @@
 
 namespace fs = std::filesystem;
 
-Logger::Logger() : _level(Type::INFO),
+Logger::Logger() : _level(Type::TRACE),
                    _sink(Sink::CONSOLE_FILE),
                    _logDirPath("../logs/"),
                    _curLogFilePath(_logDirPath + "log.txt") {
@@ -115,6 +115,7 @@ void Logger::setLevel(const Type& type) {
 }
 
 void Logger::log(const Type& type, const QString& msg) {
+    if (type > _level) return;
     switch (_sink) {
         case Sink::CONSOLE:
             logToConsole(type, msg);

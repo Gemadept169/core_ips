@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QTimer>
 
+#include "entities/system_info/power.h"
 #include "entities/system_info/temperature.h"
 
 class SystemMonitor final : public QObject {
@@ -24,6 +25,7 @@ class SystemMonitor final : public QObject {
 
     QTimer *_refreshTimer;
     Temperature _temperature;
+    Power _power;
 };
 
 #endif

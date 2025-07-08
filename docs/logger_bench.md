@@ -1,0 +1,1 @@
+- Calculated interval of each LOG_* command: ~190 micro

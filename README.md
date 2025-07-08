@@ -36,8 +36,8 @@
   - [x] Calculate sot processing time
   - [x] Calculate delay all process
   - [x] Test leak memory
-- [ ] Implement logging system (choose between two options: print to console or save to file (based on config file))
-- [ ] Synchronize timezone automatically by chrony 
+- [x] Implement logging system (choose between two options: print to console or save to file (based on config file))
+- [ ] Log temperature and power consumption from Jetson Orin SOC
 - [ ] Optimize the gst pipeline for capturing video
   - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
   - [ ] Auto reconnecting when rtsp streaming failed

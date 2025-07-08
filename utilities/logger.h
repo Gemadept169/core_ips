@@ -23,7 +23,7 @@ class Logger : public QObject {
     };
 
     enum class Type : unsigned char {
-        ERROR,
+        ERROR = 0,
         WARN,
         INFO,
         DEBUG,

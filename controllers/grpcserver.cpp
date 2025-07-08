@@ -1,6 +1,5 @@
 #include "grpcserver.h"
 
-#include <QDebug>
 #include <QJsonObject>
 #include <QJsonValue>
 #include <QThread>
@@ -24,7 +23,6 @@ GrpcServer::~GrpcServer() {
 
 bool GrpcServer::fromJson(const QJsonObject& json, GrpcServer*& out, QObject* parent) {
     if (out) {
-        return false;
         delete out;
         out = nullptr;
     }

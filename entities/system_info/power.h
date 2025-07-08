@@ -11,6 +11,7 @@ class Power {
     Power(const Power &) = delete;
     Power &operator=(const Power &) = delete;
     ~Power();
+
     void refresh();
     friend std::ostream &operator<<(std::ostream &out, const Power &temp);
 

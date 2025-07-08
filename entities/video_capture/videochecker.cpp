@@ -1,11 +1,12 @@
 #include "videochecker.h"
 
 #include <QByteArray>
-#include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QProcess>
 #include <QString>
+
+#include "utilities/logger.h"
 
 namespace {
 bool checkRtspServerIsAvailable(const QString &rtspPath) {
@@ -45,16 +46,16 @@ VideoChecker::~VideoChecker() {
 }
 
 void VideoChecker::atVideoDisconnected() {
-    qDebug() << "[VideoChecker::atVideoDisconnected]";
+    LOG_WARN("The video streaming disconnected!");
     if (_retryTimer && !_retryTimer->isActive()) {
         _retryTimer->start();
     }
 }
 
 void VideoChecker::checkConnection() {
-    qDebug() << "[VideoChecker::checkConnection]";
+    LOG_WARN("Checking video streaming connection...");
     if (checkRtspServerIsAvailable(_rtspPath)) {
-        qDebug() << "[VideoChecker::checkConnection] Video is connected";
+        LOG_INFO("Rtsp server is ready");
         emit hasVideoConnected();
         if (_retryTimer && _retryTimer->isActive()) {
             _retryTimer->stop();
