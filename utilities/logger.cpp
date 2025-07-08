@@ -14,7 +14,8 @@ namespace fs = std::filesystem;
 Logger::Logger() : _level(Type::TRACE),
                    _sink(Sink::CONSOLE_FILE),
                    _logDirPath("../logs/"),
-                   _curLogFilePath(_logDirPath + "log.txt") {
+                   _rotatingFilesNum(3),
+                   _rotatingBytesMax4One(3 * 1024 * 1024) {
     const std::string logDirStdPath = _logDirPath.toStdString();
     if (!fs::exists(logDirStdPath)) {
         fs::create_directory(logDirStdPath);
@@ -27,9 +28,25 @@ void Logger::logToConsole(const Type& type, const QString& msg) {
 }
 
 void Logger::logToFile(const Type& type, const QString& msg) {
-    QFile logFile(_curLogFilePath);
-    if (logFile.open(QFile::WriteOnly | QFile::Append)) {
-        QTextStream out(&logFile);
+    QFile curLogFile(_logDirPath + "log.txt.1");
+    if (curLogFile.size() >= _rotatingBytesMax4One) {
+        // Remove the olders file
+        std::string logDirPath = _logDirPath.toStdString() + "log.txt.";
+        const std::string oldestPath = logDirPath + std::to_string(_rotatingFilesNum);
+        if (fs::exists(oldestPath)) {
+            fs::remove(oldestPath);
+        }
+        // Shifting number of file indies
+        for (int lastIdx = _rotatingFilesNum; lastIdx > 1; lastIdx--) {
+            const std::string fromFilePath = logDirPath + std::to_string(lastIdx - 1);
+            const std::string toFilePath = logDirPath + std::to_string(lastIdx);
+            if (fs::exists(fromFilePath) && !fs::exists(toFilePath)) {
+                fs::rename(fromFilePath, toFilePath);
+            }
+        }
+    }
+    if (curLogFile.open(QFile::WriteOnly | QFile::Append)) {
+        QTextStream out(&curLogFile);
         out << Logger::prependTypeInfo(type, msg) << Qt::endl;
     }
 }

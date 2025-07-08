@@ -37,7 +37,8 @@
   - [x] Calculate delay all process
   - [x] Test leak memory
 - [x] Implement logging system (choose between two options: print to console or save to file (based on config file))
-- [ ] Log temperature and power consumption from Jetson Orin SOC
+- [x] Log temperature and power consumption from Jetson Orin SOC
+- [x] Add rotating file feature for logger.
 - [ ] Optimize the gst pipeline for capturing video
   - [ ] Decode rtsp pipeline by NVIDIA-GPU and capture streaming video and convert it to cv::Mat (using gstreamer and its plugins)
   - [ ] Auto reconnecting when rtsp streaming failed

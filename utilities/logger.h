@@ -59,6 +59,8 @@ class Logger : public QObject {
     QString _curLogFilePath;
     Sink _sink;
     Type _level;
+    uint _rotatingFilesNum;
+    size_t _rotatingBytesMax4One;
 };
 
 #endif
