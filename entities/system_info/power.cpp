@@ -22,10 +22,17 @@ void Power::refresh() {
                 const std::string currPath = dir.path().string() + "/curr" + railIdxStr + "_input";
                 std::ifstream labelFile(labelPath), voltFile(voltPath), currFile(currPath);
                 std::string labelMilliWat, millivolts, milliamperes;
-                std::getline(labelFile, labelMilliWat);
-                std::getline(voltFile, millivolts);
-                std::getline(currFile, milliamperes);
-                _data[labelMilliWat] = (std::stof(millivolts) / 1000.0f) * std::stof(milliamperes);
+                try {
+                    std::getline(labelFile, labelMilliWat);
+                    std::getline(voltFile, millivolts);
+                    std::getline(currFile, milliamperes);
+                    if (labelMilliWat == "" || millivolts == "" || milliamperes == "") {
+                        continue;
+                    }
+                    _data[labelMilliWat] = (std::stof(millivolts) / 1000.0f) * std::stof(milliamperes);
+                } catch (...) {
+                    continue;
+                }
             }
         }
     }

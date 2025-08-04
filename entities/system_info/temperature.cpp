@@ -18,9 +18,16 @@ void Temperature::refresh() {
             const std::string tempPath = dir.path().string() + "/temp";
             std::ifstream labelFile(labelPath), tempFile(tempPath);
             std::string label, temp;
-            std::getline(labelFile, label);
-            std::getline(tempFile, temp);
-            _data[label] = std::stof(temp) / 1000.0f;
+            try {
+                std::getline(labelFile, label);
+                std::getline(tempFile, temp);
+                if (label == "" || temp == "") {
+                    continue;
+                }
+                _data[label] = std::stof(temp) / 1000.0f;
+            } catch (...) {
+                continue;
+            }
         }
     }
 }
