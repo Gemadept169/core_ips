@@ -1,5 +1,5 @@
 {
-    "rtspSource": "rtsp://192.168.1.250:8555/cam",
+    "rtspSource": "rtsp://192.168.1.30/mux1.sdp",
     "retryIntervalMsec": 5000,
     "videoFps": 30
 }

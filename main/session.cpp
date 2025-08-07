@@ -20,11 +20,12 @@ Session::Session(QObject* parent) : QObject(parent),
     _sotController->moveToThread(&_sotThread);
     _grpcServer->moveToThread(&_grpcThread);
     _systemMonitor->moveToThread(&_systemThread);
+    LOG_INSTACE.setLevel(Logger::Type::TRACE);
     LOG_INSTACE.moveToThread(&_systemThread);
 
     initObjectConnections();
     startThreads();
-    LOG_INFO("Wellcome to new session!");
+    LOG_INFO("Wellcome to new session!")
 }
 
 Session::~Session() {

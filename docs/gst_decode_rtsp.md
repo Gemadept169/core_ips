@@ -54,6 +54,8 @@ nvvidconv ! nvv4l2h264enc ! h264parse ! mp4mux ! filesink location=output.mp4
 gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=100 tcp-timeout=1 ! queue ! \
 rtph264depay ! h264parse ! mp4mux ! filesink location=output.mp4
 
+Link test latency: gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.30/mux1.sdp latency=100 tcp-timeout=1 ! queue ! rtph264depay ! h264parse ! avdec_h264 output-corrupt=false ! autovideosink
+
 gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=100 tcp-timeout=1 ! appsink
 
 gst-launch-1.0 -v rtspsrc location=rtsp://192.168.1.250:8555/cam latency=200 ! fakesink

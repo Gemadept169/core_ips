@@ -28,6 +28,7 @@ class CvVideoCapture : public QObject {
    private:
     cv::Ptr<cv::VideoCapture> _cap;
     uint _fps;
+    float _realFps;
     QString _rtspPath;
     QTimer *_readTimer;
 };

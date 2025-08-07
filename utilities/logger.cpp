@@ -11,11 +11,11 @@
 
 namespace fs = std::filesystem;
 
-Logger::Logger() : _level(Type::TRACE),
+Logger::Logger() : _level(Type::INFO),
                    _sink(Sink::CONSOLE_FILE),
                    _logDirPath("../logs/"),
                    _rotatingFilesNum(3),
-                   _rotatingBytesMax4One(3 * 1024 * 1024) {
+                   _rotatingBytesMax4One(1 * 1024 * 1024 * 1024) {  // 3GB
     const std::string logDirStdPath = _logDirPath.toStdString();
     if (!fs::exists(logDirStdPath)) {
         fs::create_directory(logDirStdPath);
@@ -88,6 +88,7 @@ Logger& Logger::instance() {
 }
 
 void Logger::info(const QString& msg) {
+    if (_level < Logger::Type::INFO) return;
     QString extMsg;
     Logger::prependExtraInfo(extMsg, msg);
     QMetaObject::invokeMethod(this, &Logger::log, Qt::QueuedConnection,
@@ -95,6 +96,7 @@ void Logger::info(const QString& msg) {
                               extMsg);
 }
 void Logger::warn(const QString& msg) {
+    if (_level < Logger::Type::WARN) return;
     QString extMsg;
     Logger::prependExtraInfo(extMsg, msg);
     QMetaObject::invokeMethod(this, &Logger::log, Qt::QueuedConnection,
@@ -102,6 +104,7 @@ void Logger::warn(const QString& msg) {
                               extMsg);
 }
 void Logger::error(const QString& msg) {
+    if (_level < Logger::Type::ERROR) return;
     QString extMsg;
     Logger::prependExtraInfo(extMsg, msg);
     QMetaObject::invokeMethod(this, &Logger::log, Qt::QueuedConnection,
@@ -109,6 +112,7 @@ void Logger::error(const QString& msg) {
                               extMsg);
 }
 void Logger::debug(const QString& msg) {
+    if (_level < Logger::Type::DEBUG) return;
     QString extMsg;
     Logger::prependExtraInfo(extMsg, msg);
     QMetaObject::invokeMethod(this, &Logger::log, Qt::QueuedConnection,
@@ -116,6 +120,7 @@ void Logger::debug(const QString& msg) {
                               extMsg);
 }
 void Logger::trace(const QString& msg) {
+    if (_level < Logger::Type::TRACE) return;
     QString extMsg;
     Logger::prependExtraInfo(extMsg, msg);
     QMetaObject::invokeMethod(this, &Logger::log, Qt::QueuedConnection,
@@ -132,7 +137,7 @@ void Logger::setLevel(const Type& type) {
 }
 
 void Logger::log(const Type& type, const QString& msg) {
-    if (type > _level) return;
+    if (_level < type) return;
     switch (_sink) {
         case Sink::CONSOLE:
             logToConsole(type, msg);

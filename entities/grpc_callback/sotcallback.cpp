@@ -37,19 +37,19 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
             QMetaObject::invokeMethod(_sotCallback->grpcServer(),
                                       &GrpcServer::hasSotTrackStop,
                                       Qt::QueuedConnection);
-            LOG_DEBUG("TrackStartImpl: OnDone func sent a signal to stop task");
+            LOG_DEBUG("TrackStartImpl: OnDone func sent a signal to stop task")
         }
         {
             std::unique_lock<std::mutex> lock(_sotCallback->_mu);
             _sotCallback->_cv.notify_one();
-            LOG_DEBUG("TrackStartImpl: OnDone func notified one");
+            LOG_DEBUG("TrackStartImpl: OnDone func notified one")
         }
         _sotCallback->_isBusy.store(false);
         delete this;
     }
 
     void OnCancel() override {
-        LOG_DEBUG("TrackStartImpl: OnCancel func");
+        LOG_DEBUG("TrackStartImpl: OnCancel func")
     }
 
    private:
@@ -147,13 +147,13 @@ SotCallback::~SotCallback() {
 grpc::ServerWriteReactor<core_ips::sot::TrackResponse>*
 SotCallback::TrackStart(grpc::CallbackServerContext* context,
                         const core_ips::sot::TrackRequest* request) {
-    LOG_DEBUG("SotCallback: TrackStart has new request");
+    LOG_DEBUG("SotCallback: TrackStart has new request")
     if (_isBusy.load()) {
         _isBusy.store(false);
         std::unique_lock<std::mutex> lock(_mu);
         _cv.wait(lock);
     }
-    LOG_DEBUG("SotCallback: TrackStart deleted old task");
+    LOG_DEBUG("SotCallback: TrackStart deleted old task")
     if (grpcServer() && request != nullptr) {
         sot::BBox incomingBox;
         incomingBox.xtl = request->init_bbox().xtl();
@@ -164,7 +164,7 @@ SotCallback::TrackStart(grpc::CallbackServerContext* context,
                                   &GrpcServer::hasSotTrackNewRequest,
                                   Qt::QueuedConnection,
                                   incomingBox);
-        LOG_DEBUG("SotCallback: TrackStart sent a signal to init new sot task");
+        LOG_DEBUG("SotCallback: TrackStart sent a signal to init new sot task")
     }
     _dataQueue.clear();
     return new TrackStartImpl(this, context);
@@ -173,7 +173,7 @@ SotCallback::TrackStart(grpc::CallbackServerContext* context,
 grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* context,
                                                  const google::protobuf::Empty* request,
                                                  google::protobuf::Empty* response) {
-    LOG_DEBUG("SotCallback: TrackStop has new request");
+    LOG_DEBUG("SotCallback: TrackStop has new request")
     if (_isBusy.load()) {
         _isBusy.store(false);
     }

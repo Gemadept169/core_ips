@@ -99,7 +99,7 @@ void GrpcServer::startServer() {
         builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
         builder.RegisterService(_sotCallback);
         _server = builder.BuildAndStart();
-        LOG_INFO(QString("Grpc server listening on %1").arg(QString::fromStdString(server_address)));
+        LOG_INFO(QString("Grpc server listening on %1").arg(QString::fromStdString(server_address)))
         _server->Wait();
     });
     QObject::connect(grpcThread, &QThread::finished, grpcThread, &QThread::deleteLater);

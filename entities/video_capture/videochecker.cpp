@@ -46,16 +46,16 @@ VideoChecker::~VideoChecker() {
 }
 
 void VideoChecker::atVideoDisconnected() {
-    LOG_WARN("The video streaming disconnected!");
+    LOG_WARN("The video streaming disconnected!")
     if (_retryTimer && !_retryTimer->isActive()) {
         _retryTimer->start();
     }
 }
 
 void VideoChecker::checkConnection() {
-    LOG_WARN("Checking video streaming connection...");
+    LOG_INFO("Checking video streaming connection...")
     if (checkRtspServerIsAvailable(_rtspPath)) {
-        LOG_INFO("Rtsp server is ready");
+        LOG_INFO("Rtsp server is ready")
         emit hasVideoConnected();
         if (_retryTimer && _retryTimer->isActive()) {
             _retryTimer->stop();

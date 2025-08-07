@@ -5,11 +5,11 @@
 #include <QString>
 
 #define LOG_INSTACE Logger::instance()
-#define LOG_INFO(msg) LOG_INSTACE.info(msg)
-#define LOG_WARN(msg) LOG_INSTACE.warn(msg)
-#define LOG_ERROR(msg) LOG_INSTACE.error(msg)
-#define LOG_DEBUG(msg) LOG_INSTACE.debug(msg)
-#define LOG_TRACE(msg) LOG_INSTACE.trace(msg)
+#define LOG_ERROR(msg) LOG_INSTACE.error(msg);
+#define LOG_WARN(msg) LOG_INSTACE.warn(msg);
+#define LOG_INFO(msg) LOG_INSTACE.info(msg);
+#define LOG_DEBUG(msg) LOG_INSTACE.debug(msg);
+#define LOG_TRACE(msg) LOG_INSTACE.trace(msg);
 
 class Logger : public QObject {
     Q_OBJECT

@@ -27,6 +27,7 @@ class SotHandler : public QObject {
    private:
     std::unique_ptr<sot::SotInferInterface> _engine;
     sot::BBox _initTrackBox;
+    float _processFps;
     bool _isFirstTrack;
 };
 #endif

@@ -1,10 +1,12 @@
 #include "cvvideocapture.h"
 
+#include "utilities/elapser.h"
 #include "utilities/logger.h"
 
 CvVideoCapture::CvVideoCapture(const QString &rtspPath, const uint &fps, QObject *parent)
     : QObject(parent),
       _fps(fps),
+      _realFps(0.0f),
       _rtspPath(rtspPath),
       _cap(new cv::VideoCapture()),
       _readTimer(new QTimer(this)) {
@@ -34,9 +36,9 @@ void CvVideoCapture::startCapture() {
         if (_readTimer && !_readTimer->isActive()) {
             _readTimer->start();
         }
-        LOG_INFO("Opened rtsp stream and start capturing");
+        LOG_INFO("Opened rtsp stream and start capturing")
     } else {
-        LOG_WARN("Opening rtsp stream failed!");
+        LOG_WARN("Opening rtsp stream failed!")
         emit hasVideoDisconnected();
     }
 }
@@ -51,12 +53,18 @@ void CvVideoCapture::stopCapture() {
 }
 
 void CvVideoCapture::readFrame() {
-    cv::Mat incomingFrame;
-    if (!_cap.empty() && _cap->read(incomingFrame)) {
-        emit hasVideoNewFrame(incomingFrame);
-    } else {
-        stopCapture();
-        LOG_WARN("Can't read new frame");
-        emit hasVideoDisconnected();
+    MEASURE_ELAPSED_FUNC(readMsec, {
+        cv::Mat incomingFrame;
+        if (!_cap.empty() && _cap->read(incomingFrame)) {
+            emit hasVideoNewFrame(incomingFrame);
+        } else {
+            stopCapture();
+            LOG_WARN("Can't read new frame")
+            emit hasVideoDisconnected();
+        }
+    })
+    if (readMsec > (1000.0f / (_fps + 20))) {
+        _realFps = _realFps * 0.9f + (1000.0f / (readMsec)) * 0.1f;
+        LOG_TRACE(QString("Reading frames %1 FPS").arg(_realFps))
     }
 }

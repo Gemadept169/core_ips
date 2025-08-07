@@ -1,8 +1,12 @@
 #include "sothandler.h"
 
+#include "utilities/elapser.h"
+#include "utilities/logger.h"
+
 SotHandler::SotHandler(QObject *parent)
     : QObject(parent),
       _engine(nullptr),
+      _processFps(0.0f),
       _isFirstTrack(false) {
 }
 
@@ -25,13 +29,20 @@ void SotHandler::atStartTracking(const sot::BBox &initBBox) {
 }
 
 void SotHandler::atProcessTracking(const cv::Mat &frame) {
-    if (_isFirstTrack) {
-        _engine->init(frame, _initTrackBox);
-        _isFirstTrack = false;
-    } else {
-        sot::SotInfo advSotInfo;
-        _engine->update(frame, advSotInfo);
-        emit hasResult(advSotInfo);
+    sot::SotInfo advSotInfo;
+    MEASURE_ELAPSED_FUNC(processMsec, {
+        if (_isFirstTrack) {
+            _engine->init(frame, _initTrackBox);
+            _isFirstTrack = false;
+        } else {
+            _engine->update(frame, advSotInfo);
+            emit hasResult(advSotInfo);
+        }
+    })
+    if (processMsec > 0.5f) {
+        _processFps = _processFps * 0.9f + (1000.0f / processMsec) * 0.1f;
+        LOG_TRACE(QString("Sot info w, h: %1, %2").arg(advSotInfo.bbox.width).arg(advSotInfo.bbox.height))
+        LOG_TRACE(QString("Sot processing frames %1 FPS").arg(QString::number(_processFps)))
     }
 }
 
