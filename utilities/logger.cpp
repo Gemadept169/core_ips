@@ -14,8 +14,8 @@ namespace fs = std::filesystem;
 Logger::Logger() : _level(Type::INFO),
                    _sink(Sink::CONSOLE_FILE),
                    _logDirPath("../logs/"),
-                   _rotatingFilesNum(3),
-                   _rotatingBytesMax4One(1 * 1024 * 1024 * 1024) {  // 3GB
+                   _rotatingFilesNum(8),
+                   _rotatingBytesMax4One(100 * 1024 * 1024) {  // 100MB
     const std::string logDirStdPath = _logDirPath.toStdString();
     if (!fs::exists(logDirStdPath)) {
         fs::create_directory(logDirStdPath);

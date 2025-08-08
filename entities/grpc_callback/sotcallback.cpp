@@ -1,5 +1,6 @@
 #include "sotcallback.h"
 
+#include <QDateTime>
 #include <QMetaObject>
 #include <QThread>
 
@@ -81,11 +82,15 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
                 break;
             }
 
-            sot::SotInfo incomingInfo;
-            bool isRead = _sotCallback->_dataQueue.popFront(incomingInfo);
+            SotCallback::SotCallbackData incomingData;
+            bool isRead = _sotCallback->_dataQueue.popFront(incomingData);
             if (isRead) {
+                LOG_TRACE(QString(
+                              "Callback delay reader -> grpc StartWrite: %1 ms")
+                              .arg(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() - incomingData.frameCreatedAtMsecsSinceEpoch))
+
                 _startingTimepoint = std::chrono::steady_clock::now();
-                if (incomingInfo.score > 0.9f) {
+                if (incomingData.sotInfo.score > 0.9f) {
                     _trackLostFrameCounter = 0;
                 } else {
                     _trackLostFrameCounter++;
@@ -93,14 +98,21 @@ class TrackStartImpl : public grpc::ServerWriteReactor<core_ips::sot::TrackRespo
                 // Refer: https://stackoverflow.com/questions/33960999/protobuf-will-set-allocated-delete-the-allocated-object
                 auto out = new core_ips::sot::SotInfo();
                 auto outBox = new core_ips::sot::BBox();
-                outBox->set_xtl(incomingInfo.bbox.xtl);
-                outBox->set_ytl(incomingInfo.bbox.ytl);
-                outBox->set_width(incomingInfo.bbox.width);
-                outBox->set_height(incomingInfo.bbox.height);
+                outBox->set_xtl(incomingData.sotInfo.bbox.xtl);
+                outBox->set_ytl(incomingData.sotInfo.bbox.ytl);
+                outBox->set_width(incomingData.sotInfo.bbox.width);
+                outBox->set_height(incomingData.sotInfo.bbox.height);
                 out->set_allocated_bbox(outBox);
-                out->set_score(incomingInfo.score);
+                out->set_score(incomingData.sotInfo.score);
                 _output.set_allocated_result(out);
                 _output.set_state(core_ips::sot::TrackResponse::State::TrackResponse_State_NORMAL);
+                auto gTimestamp = new google::protobuf::Timestamp();
+                const qint64 msecsSinceEpoch = incomingData.frameCreatedAtMsecsSinceEpoch;
+                const int64_t secs = static_cast<int64_t>(msecsSinceEpoch / 1000);
+                const int32_t nanos = static_cast<int32_t>((msecsSinceEpoch - secs * 1000) * 1000000);
+                gTimestamp->set_seconds(secs);
+                gTimestamp->set_nanos(nanos);
+                _output.set_allocated_frame_created_at(gTimestamp);
                 StartWrite(&_output);
                 result = true;
                 break;
@@ -136,7 +148,7 @@ SotCallback::SotCallback(GrpcServer* grpcServer,
     : CallbackBase(grpcServer),
       _isBusy(false),
       _isVideoConnected(true),
-      _dataQueue(SafeQueue<sot::SotInfo>()),
+      _dataQueue(SafeQueue<SotCallbackData>()),
       _writerTimeoutMsecs(writerTimeoutMsecs),
       _trackLostFrameMax(trackLostFrameMax) {
 }
@@ -189,8 +201,8 @@ grpc::ServerUnaryReactor* SotCallback::TrackStop(grpc::CallbackServerContext* co
     return reactor;
 }
 
-void SotCallback::pushResultData(const sot::SotInfo& info) {
-    _dataQueue.pushBack(info);
+void SotCallback::pushResultData(const sot::SotInfo& info, const qint64& frameCreatedAtMsecsSinceEpoch) {
+    _dataQueue.pushBack(SotCallbackData{info, frameCreatedAtMsecsSinceEpoch});
 }
 
 void SotCallback::setIsVideoConnected(const bool& isConnected) {

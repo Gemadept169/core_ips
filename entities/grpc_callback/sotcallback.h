@@ -16,6 +16,12 @@ class SotCallback : public CallbackBase,
     friend TrackStartImpl;
 
    public:
+    struct SotCallbackData {
+        sot::SotInfo sotInfo;
+        qint64 frameCreatedAtMsecsSinceEpoch;
+    };
+
+   public:
     explicit SotCallback(GrpcServer* grpcServer,
                          const std::chrono::milliseconds& writerTimeoutMsecs = std::chrono::milliseconds(1000),
                          const unsigned int& trackLostFrameMax = 20);
@@ -30,7 +36,7 @@ class SotCallback : public CallbackBase,
                                         const google::protobuf::Empty* request,
                                         google::protobuf::Empty* response) override;
 
-    void pushResultData(const sot::SotInfo& info);
+    void pushResultData(const sot::SotInfo& info, const qint64& frameCreatedAtMsecsSinceEpoch);
 
     void setIsVideoConnected(const bool& isConnected);
 
@@ -43,7 +49,7 @@ class SotCallback : public CallbackBase,
     std::atomic_bool _isVideoConnected;
     std::condition_variable _cv;
     std::mutex _mu;
-    SafeQueue<sot::SotInfo> _dataQueue;
+    SafeQueue<SotCallbackData> _dataQueue;
     std::chrono::milliseconds _writerTimeoutMsecs;
     unsigned int _trackLostFrameMax;
 };

@@ -1,5 +1,7 @@
 #include "sothandler.h"
 
+#include <QDateTime>
+
 #include "utilities/elapser.h"
 #include "utilities/logger.h"
 
@@ -28,7 +30,11 @@ void SotHandler::atStartTracking(const sot::BBox &initBBox) {
     _initTrackBox = initBBox;
 }
 
-void SotHandler::atProcessTracking(const cv::Mat &frame) {
+void SotHandler::atProcessTracking(const cv::Mat &frame, const qint64 &frameCreatedAtMsecsSinceEpoch) {
+    LOG_TRACE(QString(
+                  "Sot delay reader -> atProcessTracking: %1 ms")
+                  .arg(QDateTime::currentDateTimeUtc().toMSecsSinceEpoch() - frameCreatedAtMsecsSinceEpoch))
+
     sot::SotInfo advSotInfo;
     MEASURE_ELAPSED_FUNC(processMsec, {
         if (_isFirstTrack) {
@@ -36,7 +42,7 @@ void SotHandler::atProcessTracking(const cv::Mat &frame) {
             _isFirstTrack = false;
         } else {
             _engine->update(frame, advSotInfo);
-            emit hasResult(advSotInfo);
+            emit hasResult(advSotInfo, frameCreatedAtMsecsSinceEpoch);
         }
     })
     if (processMsec > 0.5f) {

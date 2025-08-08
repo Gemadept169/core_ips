@@ -18,7 +18,7 @@ class VideoReader final : public QObject {
     static bool fromJson(const QJsonObject &json, VideoReader *&out, QObject *parent = nullptr);
 
    signals:
-    void hasVideoNewFrame(const cv::Mat &frame);
+    void hasVideoNewFrame(const cv::Mat &frame, const qint64 &createdAtMsecsSinceEpoch);
     void hasVideoIsConnected(const bool &isConnected);
 
    public slots:

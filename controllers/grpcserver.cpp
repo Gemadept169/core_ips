@@ -74,9 +74,9 @@ void GrpcServer::atStarted() {
     startServer();
 }
 
-void GrpcServer::atSotResults(const sot::SotInfo& info) {
+void GrpcServer::atSotResults(const sot::SotInfo& info, const qint64& frameCreatedAtMsecsSinceEpoch) {
     if (_sotCallback) {
-        _sotCallback->pushResultData(info);
+        _sotCallback->pushResultData(info, frameCreatedAtMsecsSinceEpoch);
     }
 }
 

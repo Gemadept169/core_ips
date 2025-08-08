@@ -29,7 +29,7 @@ class GrpcServer final : public QObject {
 
    public slots:
     void atStarted();
-    void atSotResults(const sot::SotInfo &info);
+    void atSotResults(const sot::SotInfo &info, const qint64 &frameCreatedAtMsecsSinceEpoch);
     void atVideoIsConnected(const bool &isConnected);
 
    private:

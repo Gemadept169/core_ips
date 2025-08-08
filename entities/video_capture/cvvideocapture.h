@@ -15,7 +15,7 @@ class CvVideoCapture : public QObject {
     ~CvVideoCapture();
 
    signals:
-    void hasVideoNewFrame(const cv::Mat &frame);
+    void hasVideoNewFrame(const cv::Mat &frame, const qint64 &createdAtMsecsSinceEpoch);
     void hasVideoDisconnected();
 
    public slots:

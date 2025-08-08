@@ -16,12 +16,12 @@ class SotHandler : public QObject {
     ~SotHandler();
 
    signals:
-    void hasResult(const sot::SotInfo &);
+    void hasResult(const sot::SotInfo &, const qint64 &frameCreatedAtMsecsSinceEpoch);
 
    public slots:
     void atStarted();
     void atStartTracking(const sot::BBox &initBBox);
-    void atProcessTracking(const cv::Mat &frame);
+    void atProcessTracking(const cv::Mat &frame, const qint64 &frameCreatedAtMsecsSinceEpoch);
     void atStopTracking();
 
    private:

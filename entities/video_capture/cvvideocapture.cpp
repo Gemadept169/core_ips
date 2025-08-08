@@ -1,5 +1,7 @@
 #include "cvvideocapture.h"
 
+#include <QDateTime>
+
 #include "utilities/elapser.h"
 #include "utilities/logger.h"
 
@@ -56,7 +58,7 @@ void CvVideoCapture::readFrame() {
     MEASURE_ELAPSED_FUNC(readMsec, {
         cv::Mat incomingFrame;
         if (!_cap.empty() && _cap->read(incomingFrame)) {
-            emit hasVideoNewFrame(incomingFrame);
+            emit hasVideoNewFrame(incomingFrame, QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
         } else {
             stopCapture();
             LOG_WARN("Can't read new frame")

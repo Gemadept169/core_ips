@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
 
 package core_ips.sot;
 
@@ -35,4 +36,5 @@ message TrackResponse {
     }
     State state = 1;
     SotInfo result = 2;
+    google.protobuf.Timestamp frame_created_at = 3;
 }
